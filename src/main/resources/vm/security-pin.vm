@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
+  <form>
+    <var name="sessionId" expr="'$sessionId'" />
+    <var name="phoneNum" expr="'$phoneNum'" />
+    <var name="motechId" expr="'$motechId'" />
+    
+    <field name="securitypin" type="digits?length=4">
+        <prompt>
+            Hello motech demo user. This is a pill reminder. To get started, please enter the 4 digit pin assigned to you.
+        </prompt>
+        
+        <filled>
+            <if cond="securitypin != '$pin'">
+              <prompt>You entered an incorrect pin. Please try again.</prompt>
+              <clear namelist="securitypin" />
+            
+              <else />
+                <prompt>Your pin number has been accepted.</prompt>
+                <exit />
+                <!-- <submit namelist="sessionId phoneNum motechId" next="http://130.111.132.27:8080/motech-platform-server/module/pill-demo/ivr" /> -->
+            </if>
+        </filled>
+    </field>
+  </form>
+</vxml>
