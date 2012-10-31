@@ -7,6 +7,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.decisiontree.server.service.DecisionTreeServer;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
 import org.motechproject.mrs.model.Attribute;
 import org.motechproject.mrs.model.MRSPatient;
@@ -22,17 +23,20 @@ public class PillReminderTest {
     @Mock
     FlowSessionService flowSessionService;
 
+    @Mock
+    DecisionTreeServer decisionTreeServer;
+
     private DemoPillReminderService reminder;
 
     @Before
     public void setUp() {
         initMocks(this);
-        reminder = new DemoPillReminderService(patientAdapter, flowSessionService);
+        reminder = new DemoPillReminderService(patientAdapter, flowSessionService, decisionTreeServer);
     }
 
     @Test
     public void shouldReturnPatientNotFoundView() {
-        ModelAndView view = reminder.getViewForPatient("500", null, null);
+        ModelAndView view = reminder.getSecurityPinView("500", null);
 
         assertEquals("patient-not-found", view.getViewName());
     }
@@ -41,7 +45,7 @@ public class PillReminderTest {
     public void shouldUseDefaultPinOnFirstConnectionWithNullPerson() {
         when(patientAdapter.getPatientByMotechId("500")).thenReturn(new MRSPatient("500"));
 
-        ModelAndView view = reminder.getViewForPatient("500", "SessionId", null);
+        ModelAndView view = reminder.getSecurityPinView("500", "SessionId");
 
         assertEquals("security-pin", view.getViewName());
         assertEquals(DemoPillReminderService.DEFAULT_PIN, view.getModel().get("pin").toString());
@@ -53,7 +57,7 @@ public class PillReminderTest {
         MRSPatient patient = new MRSPatient("500", person, null);
         when(patientAdapter.getPatientByMotechId("500")).thenReturn(patient);
 
-        ModelAndView view = reminder.getViewForPatient("500", "SessionId", null);
+        ModelAndView view = reminder.getSecurityPinView("500", "SessionId");
         assertEquals(DemoPillReminderService.DEFAULT_PIN, view.getModel().get("pin").toString());
     }
 
@@ -64,7 +68,7 @@ public class PillReminderTest {
         MRSPatient patient = new MRSPatient("500", person, null);
         when(patientAdapter.getPatientByMotechId("500")).thenReturn(patient);
 
-        ModelAndView view = reminder.getViewForPatient("500", "SessionId", null);
+        ModelAndView view = reminder.getSecurityPinView("500", "SessionId");
         assertEquals("5432", view.getModel().get("pin").toString());
     }
 }

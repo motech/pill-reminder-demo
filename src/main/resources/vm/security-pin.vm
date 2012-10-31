@@ -2,8 +2,6 @@
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
   <form>
     <var name="sessionId" expr="'$sessionId'" />
-    <var name="phoneNum" expr="'$phoneNum'" />
-    <var name="motechId" expr="'$motechId'" />
     
     <field name="securitypin" type="digits?length=4">
         <prompt>
@@ -17,8 +15,7 @@
             
               <else />
                 <prompt>Your pin number has been accepted.</prompt>
-                <exit />
-                <!-- <submit namelist="sessionId phoneNum motechId" next="http://130.111.132.27:8080/motech-platform-server/module/pill-demo/ivr" /> -->
+                <submit namelist="sessionId" next="http://130.111.132.27:8080/motech-platform-server/module/pill-demo/decisiontree" />
             </if>
         </filled>
     </field>
