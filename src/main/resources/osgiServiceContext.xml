@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:osgi="http://www.springframework.org/schema/osgi"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+
+    <osgi:reference cardinality="0..1" id="flowSessionServiceOsgi"
+        interface="org.motechproject.decisiontree.server.service.FlowSessionService" />
+
+    <osgi:reference cardinality="0..1" id="mrsPatientAdapterOsgi" interface="org.motechproject.mrs.services.MRSPatientAdapter" />
+
+    <osgi:reference cardinality="0..1" id="mrsFacilityAdapterOsgi" interface="org.motechproject.mrs.services.MRSFacilityAdapter" />
+
+    <osgi:reference cardinality="0..1" id="mrsUserAdapterOsgi" interface="org.motechproject.mrs.services.MRSUserAdapter" />
+
+    <osgi:reference cardinality="0..1" id="mrsEncounterAdapterOsgi" interface="org.motechproject.mrs.services.MRSEncounterAdapter" />
+
+    <osgi:reference cardinality="0..1" id="decisionTreeServiceOsgi"
+        interface="org.motechproject.decisiontree.server.service.DecisionTreeService" />
+
+    <osgi:reference cardinality="0..1" id="decisionTreeServerOsgi"
+        interface="org.motechproject.decisiontree.server.service.DecisionTreeServer" />
+
+    <osgi:reference cardinality="0..1" id="eventRelayOsgi" interface="org.motechproject.event.listener.EventRelay" />
+
+    <osgi:reference id="eventListenerRegistryServiceOsgi" interface="org.motechproject.event.listener.EventListenerRegistryService" />
+</beans>

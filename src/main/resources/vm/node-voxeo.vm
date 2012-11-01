@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
+    #if ($node.transitions.size() > 0)
     <menu>
         <prompt>
             #foreach( $prompt in $node.prompts )
@@ -12,13 +13,28 @@
                 #end
             #end
         </prompt>
-        #if ($node.transitions.size() > 0)
             #foreach( $mapEntry in $node.transitions.entrySet() )
-                #set ($url = "$scheme://$host$contextPath$servletPath/decisiontree?sessionId=$sessionId&phoneNum=$phoneNum&ln=$language&tNm=$treeName&trK=$mapEntry.key")
-                <choice dtmf="$mapEntry.key" next="$url"/>
+                #set ($url = "$scheme://$host$contextPath$servletPath/decisiontree?sessionId=$sessionId&ln=$language&tNm=$treeName&trK=$mapEntry.key")
+                <choice dtmf="$mapEntry.key" next="$escape.escapeXml($url)"/>
             #end
-         #else
-             <exit/>
-        #end
     </menu>
+    #else
+    <form>
+        <block>
+            <prompt>
+                #foreach( $prompt in $node.prompts )
+                    #if($prompt.class.simpleName == "AudioPrompt")
+                        <audio src="$prompt.audioFileUrl">
+                               $prompt.altMessage
+                        </audio>
+                    #else
+                        $prompt.message
+                    #end
+                #end
+            </prompt>
+        </block>
+        
+        <exit/>
+     </form>
+    #end
 </vxml>

@@ -15,7 +15,7 @@
             
               <else />
                 <prompt>Your pin number has been accepted.</prompt>
-                <submit namelist="sessionId" next="http://130.111.132.27:8080/motech-platform-server/module/pill-demo/decisiontree" />
+                <submit namelist="sessionId" next="http://130.111.132.27:8080/motech-platform-server/module/pillreminder-demo/decisiontree" />
             </if>
         </filled>
     </field>

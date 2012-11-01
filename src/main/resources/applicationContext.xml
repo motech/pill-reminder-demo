@@ -7,6 +7,8 @@
        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
 
+    <import resource="classpath:osgiServiceContext.xml" />
+
     <context:annotation-config />
     <context:component-scan base-package="org.motechproject.demo.pillreminder" />
 
@@ -28,14 +30,5 @@
         <property name="exposeSpringMacroHelpers" value="true" />
     </bean>
 
-    <osgi:reference cardinality="0..1" id="flowSessionServiceOsgi"
-        interface="org.motechproject.decisiontree.server.service.FlowSessionService" />
-
-    <osgi:reference cardinality="0..1" id="mrsPatientAdapterOsgi" interface="org.motechproject.mrs.services.MRSPatientAdapter" />
-
-    <osgi:reference cardinality="0..1" id="decisionTreeServiceOsgi"
-        interface="org.motechproject.decisiontree.server.service.DecisionTreeService" />
-
-    <osgi:reference cardinality="0..1" id="decisionTreeServerOsgi"
-        interface="org.motechproject.decisiontree.server.service.DecisionTreeServer" />
+    <bean class="org.motechproject.event.listener.annotations.EventAnnotationBeanPostProcessor" />
 </beans>
