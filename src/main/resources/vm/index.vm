@@ -1,0 +1,30 @@
+<!doctype html>
+<html ng-app="pillReminder">
+    <head>
+        <link type="text/css" rel="stylesheet" href="$path/pillreminder-resources/css/bootstrap.css" />
+        <script type="text/javascript" src="$path/pillreminder-resources/js/angular.min.js"></script>
+        <script type="text/javascript" src="$path/pillreminder-resources/js/angular-resource.min.js"></script>
+        <script type="text/javascript" src="$path/pillreminder-resources/app/app.js"></script>
+    </head>
+    <body>
+        <h1>Pill Reminder Demo</h1>
+        
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span10 offset2">
+                    <form ng-controller="EnrollController">
+                        <fieldset>
+                            <legend>Enroll Patient into Pill Reminder</legend>
+                            <label>Patient OpenMRS MoTeCH Id</label>
+                            <input type="text" ng-model="enrollment.motechId" />
+                            <label>Start time of dosage</label>
+                            <input type="text" ng-model="enrollment.startTime" placeholder="e.g. 1 or 15" />
+                            <br />
+                            <button type="submit" class="btn" ng-click="enrollPatient()">Enroll</button>
+                        </fieldset>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

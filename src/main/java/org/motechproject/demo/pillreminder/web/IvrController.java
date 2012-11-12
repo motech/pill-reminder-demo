@@ -3,7 +3,7 @@ package org.motechproject.demo.pillreminder.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.motechproject.demo.pillreminder.DemoPillReminderService;
+import org.motechproject.demo.pillreminder.service.DemoPillReminderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.decisiontree.server.service.DecisionTreeServer;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
+import org.motechproject.demo.pillreminder.service.DemoPillReminderService;
 import org.motechproject.mrs.model.Attribute;
 import org.motechproject.mrs.model.MRSPatient;
 import org.motechproject.mrs.model.MRSPerson;

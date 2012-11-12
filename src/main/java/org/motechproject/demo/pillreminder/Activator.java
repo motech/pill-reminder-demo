@@ -13,10 +13,9 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class Activator implements BundleActivator {
     private static Logger logger = LoggerFactory.getLogger(Activator.class);
 
-    private static final String CONTEXT_CONFIG_LOCATION = "applicationContext.xml";
+    private static final String CONTEXT_CONFIG_LOCATION = "spring/applicationContext.xml";
     private static final String SERVLET_URL_MAPPING = "/pillreminder-demo";
-
-    private static final String MODULE_NAME = "pillreminder-demo";
+    private static final String RESOURCE_URL_MAPPING = "/pillreminder-resources";
 
     private ServiceTracker httpServiceTracker;
 
@@ -68,6 +67,7 @@ public class Activator implements BundleActivator {
                 Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
 
                 service.registerServlet(SERVLET_URL_MAPPING, dispatcherServlet, null, null);
+                service.registerResources(RESOURCE_URL_MAPPING, "/webapp", null);
                 logger.debug("Servlet registered");
             } finally {
                 Thread.currentThread().setContextClassLoader(old);
@@ -80,6 +80,7 @@ public class Activator implements BundleActivator {
 
     private void serviceRemoved(HttpService service) {
         service.unregister(SERVLET_URL_MAPPING);
+        service.unregister(RESOURCE_URL_MAPPING);
         logger.debug("Servlet unregistered");
     }
 }

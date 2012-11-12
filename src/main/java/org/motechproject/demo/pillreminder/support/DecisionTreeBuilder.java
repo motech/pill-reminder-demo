@@ -1,4 +1,4 @@
-package org.motechproject.demo.pillreminder;
+package org.motechproject.demo.pillreminder.support;
 
 import java.util.List;
 
@@ -48,12 +48,6 @@ public class DecisionTreeBuilder {
         tree.setName("Demo Tree");
         Transition rootTransition = new Transition();
 
-        LoggingOperation lo1 = new LoggingOperation();
-        lo1.setMessage("User Pressed 1");
-
-        LoggingOperation lo2 = new LoggingOperation();
-        lo2.setMessage("User Pressed 2");
-
         rootTransition
                 .setDestinationNode(new Node()
                         .setPrompts(
@@ -78,11 +72,8 @@ public class DecisionTreeBuilder {
                                                 new Transition()
                                                         .setName("pressed2")
                                                         .setDestinationNode(
-                                                                new Node()
-                                                                        .setPrompts(
-                                                                                new TextToSpeechPrompt()
-                                                                                        .setMessage("You answered no. Thank you for your response."))
-                                                                        .addOperations(lo2)) } }));
+                                                                new Node().setPrompts(new TextToSpeechPrompt()
+                                                                        .setMessage("You answered no. Thank you for your response."))) } }));
         tree.setRootTransition(rootTransition);
 
         decisionTreeService.saveDecisionTree(tree);

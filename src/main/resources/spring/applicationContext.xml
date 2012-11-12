@@ -7,7 +7,7 @@
        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd
        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
 
-    <import resource="classpath:osgiServiceContext.xml" />
+    <import resource="classpath:/spring/osgiServiceContext.xml" />
 
     <context:annotation-config />
     <context:component-scan base-package="org.motechproject.demo.pillreminder" />
@@ -17,7 +17,7 @@
             <bean class="org.springframework.http.converter.json.GsonHttpMessageConverter" />
         </mvc:message-converters>
     </mvc:annotation-driven>
-
+    
     <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath" value="classpath:/vm" />
         <property name="preferFileSystemAccess" value="false" />
