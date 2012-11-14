@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EnrollmentResponse {
-
+    private String startTime;
+    private String pillReminderRegimenName;
+    
     private List<String> errors = new ArrayList<>();
     
     public int errorCount() {
@@ -17,6 +19,30 @@ public class EnrollmentResponse {
 
     public void addError(String string) {
         errors.add(string);
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getPillReminderRegimenName() {
+        return pillReminderRegimenName;
+    }
+
+    public void setPillReminderRegimenName(String pillReminderRegimenName) {
+        this.pillReminderRegimenName = pillReminderRegimenName;
+    }
+
+    public List<String> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
     }
 
 }

@@ -9,20 +9,44 @@
     <body>
         <h1>Pill Reminder Demo</h1>
         
-        <div class="container-fluid">
+        <div class="container-fluid" ng-controller="PillReminderDemoController">
             <div class="row-fluid">
                 <div class="span10 offset2">
-                    <form ng-controller="EnrollController">
+                    <form>
                         <fieldset>
-                            <legend>Enroll Patient into Pill Reminder</legend>
+                            <legend>Search</legend>
                             <label>Patient OpenMRS MoTeCH Id</label>
-                            <input type="text" ng-model="enrollment.motechId" />
-                            <label>Start time of dosage</label>
-                            <input type="text" ng-model="enrollment.startTime" placeholder="e.g. 1 or 15" />
+                            <input type="text" ng-model="search.motechId" />
                             <br />
-                            <button type="submit" class="btn" ng-click="enrollPatient()">Enroll</button>
+                            <button type="submit" class="btn" ng-click="searchPatient()" ng-disabled="searching">Search for Patient</button>
+                            <span ng-show="searching"><img src="$path/pillreminder-resources/img/ajax-loader.gif" /> Searching...</span>
                         </fieldset>
                     </form>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span10 offset2" ng-show="patient.motechId">
+					<fieldset>
+						<legend>Enroll Patient into Pill Reminder</legend>
+								
+	                	<li style="color:red;" ng-repeat="error in errors">
+	                		<ul>{{error}}</ul>
+	                	</li>
+
+						<h4>Patient Information</h4>
+	                	<span><strong>First Name</strong>: {{patient.firstName}}</span>&nbsp;
+	                	<span><strong>Last Name</strong>: {{ patient.lastName }}</span>&nbsp;
+	                	<span><strong>MoTeCH Id</strong>: {{ patient.motechId }}</span>&nbsp;
+	                	
+	                	<form>
+	                		<label>4 Digit Pin Number</label>
+	                		<input type="text" ng-model="pinnumber" placeholder="1234" maxlength="4" />
+	                		<label>Phone Number</label>
+	                		<input type="text" ng-model="phonenumber" placeholder="2223334444" />
+	                		<br />
+	                		<button type="submit" class="btn btn-warning" ng-click="enroll()" ng-disabled="enrolling">Enroll into Pill Reminder</button>
+	                	</form>
+                	</fieldset>
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.motechproject</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.14-SNAPSHOT</version>
     <artifactId>motech-pillreminder-demo</artifactId>
     <packaging>bundle</packaging>
 
@@ -68,11 +68,6 @@
             <version>${spring.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>org.motechproject.com.google.code.gson</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.6.2</version>
@@ -90,22 +85,22 @@
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-decisiontree-core</artifactId>
-            <version>0.14-SNAPSHOT</version>
+            <version>0.14</version>
         </dependency>
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-decisiontree-server</artifactId>
-            <version>0.14-SNAPSHOT</version>
+            <version>0.14</version>
         </dependency>
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-mrs-api</artifactId>
-            <version>0.14-SNAPSHOT</version>
+            <version>0.14</version>
         </dependency>
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-pillreminder-api</artifactId>
-            <version>0.14-SNAPSHOT</version>
+            <version>0.14</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.osgi</groupId>

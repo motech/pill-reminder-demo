@@ -36,20 +36,25 @@ public class DecisionTreeBuilder {
     public void buildTree() {
         logger.info("Creating a new demo decision tree");
 
-        List<Tree> trees = decisionTreeService.getDecisionTrees();
-        for (Tree tree : trees) {
-            if ("Demo Tree".equals(tree.getName())) {
-                decisionTreeService.deleteDecisionTree(tree.getId());
-                break;
-            }
-        }
+        // spinning up a new thread so that this will not block the bundle
+        // loading process
+        new Thread(new Runnable() {
 
-        Tree tree = new Tree();
-        tree.setName("Demo Tree");
-        Transition rootTransition = new Transition();
+            @Override
+            public void run() {
+                List<Tree> trees = decisionTreeService.getDecisionTrees();
+                for (Tree tree : trees) {
+                    if ("Demo Tree".equals(tree.getName())) {
+                        decisionTreeService.deleteDecisionTree(tree.getId());
+                        break;
+                    }
+                }
 
-        rootTransition
-                .setDestinationNode(new Node()
+                Tree tree = new Tree();
+                tree.setName("Demo Tree");
+                Transition rootTransition = new Transition();
+
+                rootTransition.setDestinationNode(new Node()
                         .setPrompts(
                                 new Prompt[] {
                                         new TextToSpeechPrompt()
@@ -74,8 +79,11 @@ public class DecisionTreeBuilder {
                                                         .setDestinationNode(
                                                                 new Node().setPrompts(new TextToSpeechPrompt()
                                                                         .setMessage("You answered no. Thank you for your response."))) } }));
-        tree.setRootTransition(rootTransition);
+                tree.setRootTransition(rootTransition);
 
-        decisionTreeService.saveDecisionTree(tree);
+                decisionTreeService.saveDecisionTree(tree);
+            }
+
+        }).start();
     }
 }
