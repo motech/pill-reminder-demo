@@ -1,11 +1,17 @@
 package org.motechproject.demo.pillreminder.domain;
 
+import org.motechproject.mrs.model.MRSPerson;
+
 public class MrsPatientSearchResult {
 
     private String firstName;
     private String lastName;
-    private String pin;
     private String motechId;
+
+    public void setFieldsFromMrsPerson(MRSPerson person) {
+        this.firstName = person.getFirstName();
+        this.lastName = person.getLastName();
+    }
 
     public String getFirstName() {
         return firstName;
@@ -21,14 +27,6 @@ public class MrsPatientSearchResult {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getPin() {
-        return pin;
-    }
-
-    public void setPin(String pin) {
-        this.pin = pin;
     }
 
     public String getMotechId() {

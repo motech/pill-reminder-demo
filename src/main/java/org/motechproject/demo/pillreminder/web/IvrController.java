@@ -26,8 +26,8 @@ public class IvrController {
      */
     @RequestMapping("/ivr")
     public ModelAndView generateVxml(HttpServletRequest request, HttpServletResponse response) {
-        String motechId = request.getParameter("motechId");
-        String phoneNum = request.getParameter("phoneNum");
+        String motechId = request.getParameter("motechid");
+        String phoneNum = request.getParameter("phonenum");
         String sessionId = reminder.registerNewFlowSession(phoneNum, motechId);
 
         ModelAndView view = reminder.getSecurityPinView(motechId, sessionId);

@@ -57,7 +57,6 @@ public class Activator implements BundleActivator {
     }
 
     private void serviceAdded(HttpService service) {
-        ClassLoader loader = DispatcherServlet.class.getClassLoader();
         try {
             DispatcherServlet dispatcherServlet = new DispatcherServlet();
             dispatcherServlet.setContextConfigLocation(CONTEXT_CONFIG_LOCATION);

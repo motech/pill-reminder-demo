@@ -1,5 +1,23 @@
 var pillReminderModule = angular.module("pillReminder", ["ngResource"]);
 
+function TabController($scope) {
+  $scope.templateUrl = "search";
+  $scope.searchSelected = "active";
+  $scope.pillReminderListSelected = "";
+  
+  $scope.switchToListing = function() {
+    $scope.templateUrl = "enrollment-listing";
+    $scope.searchSelected = "";
+    $scope.pillReminderListSelected = "active";
+  }
+  
+  $scope.switchToSearch = function() {
+    $scope.templateUrl = "search";
+    $scope.searchSelected = "active";
+    $scope.pillReminderListSelected = "";
+  }
+}
+
 function PillReminderDemoController($scope, $resource) {
   $scope.searchResource = $resource("search-patient/:motechId");
   $scope.enrollResource = $resource("enrollment");
@@ -12,11 +30,12 @@ function PillReminderDemoController($scope, $resource) {
   
   $scope.searching = false;
   $scope.enrolling = false;
+  $scope.lastEnrollment = {};
   
   $scope.searchPatient = function () {
     $scope.searching = true;
     $scope.patient = $scope.searchResource.get($scope.search, function() {
-    	$scope.searching = false;
+        $scope.searching = false;
     });
   }
   
@@ -45,6 +64,21 @@ function PillReminderDemoController($scope, $resource) {
         $scope.enrolling = false;
   	};
   	
-  	$scope.enrollResource.save(enrollment, callback, callback);
+    $scope.lastEnrollment = $scope.enrollResource.save(enrollment, callback, callback);
   }
+}
+
+function SearchController($scope, $resource) {
+    $scope.pillReminderResource = $resource("pillreminders/:motechId");
+    $scope.pillReminder = {};
+    $scope.motechId = "";
+    
+    $scope.searchPillReminder = function() {
+        $scope.pillReminder = $scope.pillReminderResource.get({"motechId": $scope.motechId});
+    }
+    
+    $scope.deletePillReminder = function() {
+        $scope.pillReminder = {};
+        $scope.pillReminderResource.delete({"motechId": $scope.motechId});
+    }
 }

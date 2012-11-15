@@ -16,6 +16,14 @@
         <spring.version>3.1.0.RELEASE</spring.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>motech-repo</id>
+            <name>MOTECH Maven Repository</name>
+            <url>http://nexus.motechproject.org/content/repositories/public</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -100,6 +108,16 @@
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-pillreminder-api</artifactId>
+            <version>0.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-ivr-api</artifactId>
+            <version>0.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-ivr-voxeo</artifactId>
             <version>0.14</version>
         </dependency>
         <dependency>

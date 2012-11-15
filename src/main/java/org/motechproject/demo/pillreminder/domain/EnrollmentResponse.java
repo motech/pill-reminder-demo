@@ -5,7 +5,6 @@ import java.util.List;
 
 public class EnrollmentResponse {
     private String startTime;
-    private String pillReminderRegimenName;
     
     private List<String> errors = new ArrayList<>();
     
@@ -27,14 +26,6 @@ public class EnrollmentResponse {
 
     public void setStartTime(String startTime) {
         this.startTime = startTime;
-    }
-
-    public String getPillReminderRegimenName() {
-        return pillReminderRegimenName;
-    }
-
-    public void setPillReminderRegimenName(String pillReminderRegimenName) {
-        this.pillReminderRegimenName = pillReminderRegimenName;
     }
 
     public List<String> getErrors() {

@@ -28,4 +28,7 @@
 
     <osgi:reference id="pillReminderServiceOsgi" cardinality="0..1"
         interface="org.motechproject.server.pillreminder.api.service.PillReminderService" />
+
+    <osgi:reference id="ivrServiceOsgi" cardinality="0..1" interface="org.motechproject.ivr.service.IVRService" />
+
 </beans>

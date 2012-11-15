@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.joda.time.DateTime;
+import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
 import org.motechproject.mrs.model.Attribute;
 import org.motechproject.mrs.model.MRSPatient;
@@ -12,14 +13,19 @@ import org.motechproject.mrs.services.MRSPatientAdapter;
 import org.motechproject.server.pillreminder.api.contract.DailyPillRegimenRequest;
 import org.motechproject.server.pillreminder.api.contract.DosageRequest;
 import org.motechproject.server.pillreminder.api.contract.MedicineRequest;
+import org.motechproject.server.pillreminder.api.contract.PillRegimenResponse;
 import org.motechproject.server.pillreminder.api.service.PillReminderService;
 import org.motechproject.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * This class will enroll patients into a prebuilt pill reminder regimen
+ */
 @Component
 public class PillReminderEnroller {
 
+    private static final int REMINDER_BUFFER_TIME = 1;
     private final PillReminderService pillReminderService;
     private final MRSPatientAdapter patientAdapter;
 
@@ -29,36 +35,45 @@ public class PillReminderEnroller {
         this.patientAdapter = patientAdapter;
     }
 
-    public EnrollmentResponse enrollPatientWithId(String externalId, String pin, String phonenumber) {
+    public EnrollmentResponse enrollPatientWithId(EnrollmentRequest request) {
         EnrollmentResponse response = new EnrollmentResponse();
 
-        MRSPatient patient = patientAdapter.getPatientByMotechId(externalId);
+        PillRegimenResponse regimenResponse = pillReminderService.getPillRegimen(request.getMotechId());
+        if (regimenResponse != null) {
+            response.addError("Patient is already enrolled in Pill Reminder Regimen.");
+            return response;
+        }
+        
+        MRSPatient patient = patientAdapter.getPatientByMotechId(request.getMotechId());
         if (patient == null) {
-            response.addError("No MRS Patient Found with id: " + externalId);
+            response.addError("No MRS Patient Found with id: " + request.getMotechId());
             return response;
         }
 
-        setAttribute(patient.getPerson(), pin, "Pin");
-        setAttribute(patient.getPerson(), phonenumber, "Phone Number");
+        setAttribute(patient.getPerson(), request.getPin(), "Pin");
+        setAttribute(patient.getPerson(), request.getPhonenumber(), "Phone Number");
         try {
             patientAdapter.updatePatient(patient);
-        } catch(Exception e) {
+        } catch (Exception e) {
             // if OpenMRS does not have attribute types of Pin or Phone Number
             // an exception will be thrown
-            
-        }
-        patient = patientAdapter.getPatientByMotechId(externalId);
-        validatePatientHasAttributes(patient.getPerson(), response);
-        if (response.errorCount() > 0) {
+            response.addError("OpenMRS does not have person attribute type: Pin or Phone Number. Please add them");
             return response;
         }
 
-        DosageRequest dosageRequest = buildDosageRequest();
-        DailyPillRegimenRequest request = new DailyPillRegimenRequest(externalId, 1, 5, 1, Arrays.asList(dosageRequest));
+        DosageRequest dosageRequest = buildDosageRequest(request.getDosageStartTime());
+        DailyPillRegimenRequest regimenRequest = new DailyPillRegimenRequest(request.getMotechId(), 1, 5,
+                REMINDER_BUFFER_TIME, Arrays.asList(dosageRequest));
 
-        pillReminderService.createNew(request);
+        pillReminderService.createNew(regimenRequest);
 
-        return null;
+        return setDosageFieldsOnResponse(dosageRequest, response);
+    }
+
+    private EnrollmentResponse setDosageFieldsOnResponse(DosageRequest dosageRequest, EnrollmentResponse response) {
+        response.setStartTime(dosageRequest.getStartHour() + ":"
+                + String.format("%02d", (dosageRequest.getStartMinute() + REMINDER_BUFFER_TIME)));
+        return response;
     }
 
     private void setAttribute(MRSPerson person, String attrValue, String attrName) {
@@ -74,38 +89,15 @@ public class PillReminderEnroller {
         person.getAttributes().add(new Attribute(attrName, attrValue));
     }
 
-    private void validatePatientHasAttributes(MRSPerson person, EnrollmentResponse response) {
-        boolean hasPin = false, hasPhone = false;
-        for (Attribute attr : person.getAttributes()) {
-            if ("Pin".equals(attr.name())) {
-                hasPin = true;
-                continue;
-            }
-
-            if ("Phone Number".equals(attr.name())) {
-                hasPhone = true;
-                continue;
-            }
-        }
-
-        if (!hasPin) {
-            response.addError("Could not set Pin attribute on person. You need to make sure OpenMRS has a person attribute type with the name Pin");
-        }
-
-        if (!hasPhone) {
-            response.addError("Could not set Phone Number attribute on person. You need to make sure OpenMRS has a person attribute type with the name Phone Number");
-        }
-    }
-
-    private DosageRequest buildDosageRequest() {
+    private DosageRequest buildDosageRequest(String dosageStartTime) {
         DateTime currentTime = DateUtil.now();
         DateTime tomorrow = currentTime.plusDays(1);
-        DateTime timeToSchedule = currentTime.plusMinutes(2);
+        String[] time = dosageStartTime.split(":");
 
         MedicineRequest medicineRequest = new MedicineRequest("Demo Prescription", currentTime.toLocalDate(),
                 tomorrow.toLocalDate());
 
-        DosageRequest request = new DosageRequest(timeToSchedule.getHourOfDay(), timeToSchedule.getMinuteOfHour(),
+        DosageRequest request = new DosageRequest(Integer.parseInt(time[0]), Integer.parseInt(time[1]),
                 Arrays.asList(medicineRequest));
 
         return request;

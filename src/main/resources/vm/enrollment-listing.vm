@@ -1,0 +1,28 @@
+<div class="container-fluid" ng-controller="SearchController">
+    <div class="row-fluid">
+        <div class="span10 offset2">
+            <form>
+                <fieldset>
+                    <legend>Search Pill Reminders</legend>
+                    <label>MoTeCH Id</label>
+                    <input type="text" ng-model="motechId" placeholder="123" />
+                    <br />
+                    <a class="btn" href="#" ng-click="searchPillReminder()"><i class="icon-search"></i> Search Pill Reminders</a>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <br />
+    <div class="row-fluid" ng-show="pillReminder.startTime">
+        <div class="span10 offset2">
+            <h4>Result</h4>
+            <br />
+            <strong>Pill Reminder Start Time</strong>: {{ pillReminder.startTime }}
+            <br />
+            <strong>Last Response Date</strong>: {{ pillReminder.lastCapturedDate }}
+            <br />
+            <br />
+            <a class="btn btn-danger" ng-click="deletePillReminder()" href="#">Delete Pill Reminder</a>
+        </div>
+    </div>
+</div>

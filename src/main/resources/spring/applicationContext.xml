@@ -12,11 +12,7 @@
     <context:annotation-config />
     <context:component-scan base-package="org.motechproject.demo.pillreminder" />
 
-    <mvc:annotation-driven>
-        <mvc:message-converters>
-            <bean class="org.springframework.http.converter.json.GsonHttpMessageConverter" />
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+    <mvc:annotation-driven />
     
     <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath" value="classpath:/vm" />
