@@ -1,5 +1,6 @@
 package org.motechproject.demo.pillreminder.domain;
 
+import org.motechproject.mrs.model.MRSPatient;
 import org.motechproject.mrs.model.MRSPerson;
 
 public class MrsPatientSearchResult {
@@ -35,6 +36,16 @@ public class MrsPatientSearchResult {
 
     public void setMotechId(String motechId) {
         this.motechId = motechId;
+    }
+
+    public static MrsPatientSearchResult fromMrsPatient(MRSPatient findPatientByMotechId) {
+        MrsPatientSearchResult result = new MrsPatientSearchResult();
+        if (findPatientByMotechId != null) {
+            result.firstName = findPatientByMotechId.getPerson().getFirstName();
+            result.lastName = findPatientByMotechId.getPerson().getLastName();
+            result.motechId = findPatientByMotechId.getMotechId();
+        }
+        return result;
     }
 
 }

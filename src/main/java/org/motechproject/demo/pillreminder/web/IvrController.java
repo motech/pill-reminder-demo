@@ -3,7 +3,7 @@ package org.motechproject.demo.pillreminder.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.motechproject.demo.pillreminder.service.DemoPillReminderService;
+import org.motechproject.demo.pillreminder.service.DecisionTreeSessionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +12,10 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class IvrController {
 
-    private DemoPillReminderService reminder;
+    private DecisionTreeSessionHandler reminder;
 
     @Autowired
-    public IvrController(DemoPillReminderService reminder) {
+    public IvrController(DecisionTreeSessionHandler reminder) {
         this.reminder = reminder;
     }
 
@@ -28,9 +28,9 @@ public class IvrController {
     public ModelAndView generateVxml(HttpServletRequest request, HttpServletResponse response) {
         String motechId = request.getParameter("motechid");
         String phoneNum = request.getParameter("phonenum");
-        String sessionId = reminder.registerNewFlowSession(phoneNum, motechId);
+        String sessionId = reminder.registerNewDecisionTreeSession(phoneNum, motechId);
 
-        ModelAndView view = reminder.getSecurityPinView(motechId, sessionId);
+        ModelAndView view = reminder.generateSecurityPinViewForSession(sessionId);
         view.addObject("sessionId", sessionId);
 
         return view;
@@ -48,7 +48,7 @@ public class IvrController {
         String sessionId = request.getParameter("sessionId");
         String transitionKey = request.getParameter("trK");
 
-        ModelAndView view = reminder.getViewForNodeTransition(sessionId, transitionKey);
+        ModelAndView view = reminder.nextViewForSessionWithNodeTransition(sessionId, transitionKey);
 
         view.addObject("contextPath", request.getContextPath());
         view.addObject("servletPath", request.getServletPath());

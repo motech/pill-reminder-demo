@@ -8,7 +8,8 @@ import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.EventRelay;
 
 /**
- * Operation that will raise an event to update the MRS patient
+ * Decision Tree Node Operation that will raise an event to indicate a patient
+ * has responded to have taken a pill dosage
  */
 public class UpdateMrsOperation implements INodeOperation {
 

@@ -7,13 +7,12 @@ import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
 import org.motechproject.demo.pillreminder.domain.MrsPatientSearchResult;
 import org.motechproject.demo.pillreminder.domain.PillReminderResponse;
-import org.motechproject.demo.pillreminder.mrs.MrsPatientSearcher;
+import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
 import org.motechproject.demo.pillreminder.support.PillReminderEnroller;
 import org.motechproject.demo.pillreminder.support.PillReminders;
 import org.motechproject.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,14 +26,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class PillReminderController {
 
     private final PillReminderEnroller enroller;
-    private final MrsPatientSearcher patientSearcher;
+    private final MrsEntityFinder mrsEntityFinder;
     private final PillReminders pillReminders;
 
     @Autowired
-    public PillReminderController(PillReminderEnroller enroller, MrsPatientSearcher patientSearcher,
+    public PillReminderController(PillReminderEnroller enroller, MrsEntityFinder mrsEntityFinder,
             PillReminders pillReminders) {
         this.enroller = enroller;
-        this.patientSearcher = patientSearcher;
+        this.mrsEntityFinder = mrsEntityFinder;
         this.pillReminders = pillReminders;
     }
 
@@ -84,7 +83,7 @@ public class PillReminderController {
     @RequestMapping(value = "/search-patient/{motechId}", method = RequestMethod.GET)
     @ResponseBody
     public MrsPatientSearchResult searchForPatient(@PathVariable String motechId) {
-        return patientSearcher.searchForPatientsWithMotechId(motechId);
+        return MrsPatientSearchResult.fromMrsPatient(mrsEntityFinder.findPatientByMotechId(motechId));
     }
 
     @RequestMapping(value = "/pillreminders/{motechId}", method = RequestMethod.GET)

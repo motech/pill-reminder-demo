@@ -5,10 +5,10 @@ import java.util.List;
 import org.motechproject.decisiontree.core.FlowSession;
 import org.motechproject.decisiontree.server.service.DecisionTreeServer;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
+import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
 import org.motechproject.mrs.model.Attribute;
 import org.motechproject.mrs.model.MRSPatient;
 import org.motechproject.mrs.model.MRSPerson;
-import org.motechproject.mrs.services.MRSPatientAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,33 +16,37 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.ModelAndView;
 
 @Service
-public class DemoPillReminderService {
+public class DecisionTreeSessionHandler {
+    private static final String MOTECH_ID_KEY = "motechId";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public static final String DEFAULT_PIN = "1234";
 
-    private final MRSPatientAdapter patientAdapter;
+    private final MrsEntityFinder mrsEntityFinder;
     private final FlowSessionService flowSessionService;
     private final DecisionTreeServer decisionTreeServer;
 
     @Autowired
-    public DemoPillReminderService(MRSPatientAdapter patientAdapter, FlowSessionService flowSessionService,
+    public DecisionTreeSessionHandler(MrsEntityFinder mrsEntityFinder, FlowSessionService flowSessionService,
             DecisionTreeServer decisionTreeServer) {
-        this.patientAdapter = patientAdapter;
+        this.mrsEntityFinder = mrsEntityFinder;
         this.flowSessionService = flowSessionService;
         this.decisionTreeServer = decisionTreeServer;
     }
 
-    public String registerNewFlowSession(String phoneNumber, String motechId) {
+    public String registerNewDecisionTreeSession(String phoneNumber, String motechId) {
         FlowSession session = flowSessionService.findOrCreate(null, phoneNumber);
-        session.set("motechId", motechId);
+        session.set(MOTECH_ID_KEY, motechId);
         flowSessionService.updateSession(session);
 
         return session.getSessionId();
     }
 
-    public ModelAndView getSecurityPinView(String motechId, String sessionId) {
-        MRSPatient patient = patientAdapter.getPatientByMotechId(motechId);
+    public ModelAndView generateSecurityPinViewForSession(String sessionId) {
+        FlowSession session = flowSessionService.getSession(sessionId);
+        String motechId = session.get(MOTECH_ID_KEY);
+        MRSPatient patient = mrsEntityFinder.findPatientByMotechId(motechId);
         if (patient == null) {
             // this should never be the case because a call cannot initiate
             // without the presence of a patient. Guard against the case
@@ -86,7 +90,7 @@ public class DemoPillReminderService {
         return mv;
     }
 
-    public ModelAndView getViewForNodeTransition(String sessionId, String transitionKey) {
+    public ModelAndView nextViewForSessionWithNodeTransition(String sessionId, String transitionKey) {
         FlowSession session = flowSessionService.getSession(sessionId);
         ModelAndView view = decisionTreeServer.getResponse(sessionId, session.getPhoneNumber(), "voxeo", "Demo Tree",
                 transitionKey, "en");
