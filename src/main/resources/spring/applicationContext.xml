@@ -12,8 +12,18 @@
     <context:annotation-config />
     <context:component-scan base-package="org.motechproject.demo.pillreminder" />
 
+    <bean id="openmrsWsSettings" class="org.motechproject.server.config.SettingsFacade" autowire="byType"
+        init-method="afterPropertiesSet">
+        <property name="configFiles">
+            <list>
+                <value>classpath:pillreminder-demo.properties</value>
+            </list>
+        </property>
+        <property name="moduleName" value="pillreminder-demo" />
+    </bean>
+
     <mvc:annotation-driven />
-    
+
     <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
         <property name="resourceLoaderPath" value="classpath:/vm" />
         <property name="preferFileSystemAccess" value="false" />

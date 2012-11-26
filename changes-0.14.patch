@@ -1,0 +1,357 @@
+diff --git a/modules/ivr/api/src/main/java/org/motechproject/ivr/service/CallRequest.java b/modules/ivr/api/src/main/java/org/motechproject/ivr/service/CallRequest.java
+index 0effe07..3c9be5a 100644
+--- a/modules/ivr/api/src/main/java/org/motechproject/ivr/service/CallRequest.java
++++ b/modules/ivr/api/src/main/java/org/motechproject/ivr/service/CallRequest.java
+@@ -30,7 +30,13 @@ public class CallRequest implements Serializable {
+     private int timeOut;
+     @JsonProperty
+     private String callBackUrl;     // this is really the channel!
+-
++    @JsonProperty
++    private String vxml;
++    @JsonProperty
++    private String motechId;
++    @JsonProperty
++    private String callerId;
++    
+     @JsonProperty
+     private Map<String, String> payload = new HashMap<String, String>();
+ 
+@@ -153,4 +159,28 @@ public class CallRequest implements Serializable {
+     public String getCallId() {
+         return callId;
+     }
++
++    public String getVxml() {
++        return vxml;
++    }
++
++    public void setVxml(String vxml) {
++        this.vxml = vxml;
++    }
++
++    public String getMotechId() {
++        return motechId;
++    }
++
++    public void setMotechId(String motechId) {
++        this.motechId = motechId;
++    }
++
++    public String getCallerId() {
++        return callerId;
++    }
++    
++    public void setCallerId(String callerId) {
++        this.callerId = callerId;
++    }
+ }
+diff --git a/modules/ivr/voxeo-bundle/pom.xml b/modules/ivr/voxeo-bundle/pom.xml
+index 4743b89..1a226f9 100644
+--- a/modules/ivr/voxeo-bundle/pom.xml
++++ b/modules/ivr/voxeo-bundle/pom.xml
+@@ -173,10 +173,12 @@
+                             org.springframework.context.config,
+                             org.springframework.context.support,
+                             org.springframework.osgi.config,
++                            org.springframework.ui.velocity,
+                             org.springframework.web.context.support,
+                             org.springframework.web.servlet.config,
+                             org.springframework.web.servlet.mvc,
+                             org.springframework.web.servlet.support,
++                            org.springframework.web.servlet.view.velocity,
+                             *
+                         </Import-Package>
+                         <Embed-Dependency>motech-ivr-voxeo</Embed-Dependency>
+diff --git a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java
+index d3d51e8..9efc505 100644
+--- a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java
++++ b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java
+@@ -1,5 +1,10 @@
+ package org.motechproject.server.voxeo;
+ 
++import java.net.MalformedURLException;
++import java.util.ArrayList;
++import java.util.Date;
++import java.util.List;
++
+ import org.apache.commons.httpclient.HttpClient;
+ import org.apache.commons.httpclient.HttpMethod;
+ import org.apache.commons.httpclient.NameValuePair;
+@@ -18,11 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.beans.factory.annotation.Qualifier;
+ import org.springframework.stereotype.Component;
+ 
+-import java.net.MalformedURLException;
+-import java.util.ArrayList;
+-import java.util.Date;
+-import java.util.List;
+-
+ /**
+  * Voxeo specific implementation of the IVR Service interface, supports initiating call given call request.
+  * <p/>
+@@ -72,9 +72,10 @@ public class VoxeoIVRService implements IVRService {
+ 
+         String voxeoURL = voxeoConfig.getServerUrl();
+         String tokenId = voxeoConfig.getTokenId(callRequest.getPayload().get(APPLICATION_NAME));
+-
++        String externalId = phoneCall.getId();
++        
+         try {
+-            HttpMethod httpMethod = generateRequestFor(voxeoURL, callRequest.getPhone(), tokenId, callRequest.getTimeOut());
++            HttpMethod httpMethod = generateRequestFor(voxeoURL, tokenId, externalId, callRequest);
+             int status = commonsHttpClient.executeMethod(httpMethod);
+             String response = httpMethod.getResponseBodyAsString();
+             log.info("HTTP Status:" + status + "|Response:" + response);
+@@ -90,15 +91,22 @@ public class VoxeoIVRService implements IVRService {
+         }
+     }
+ 
+-    private HttpMethod generateRequestFor(String voxeoUrl, String phoneNumber, String tokenId, int callTimeOut) {
++    private HttpMethod generateRequestFor(String voxeoUrl, String tokenId, String externalId, CallRequest callRequest) {
+         GetMethod getMethod = new GetMethod(voxeoUrl);
+ 
+         List<NameValuePair> queryStringValues = new ArrayList<NameValuePair>();
+         queryStringValues.add(new NameValuePair("tokenid", tokenId));
+-        queryStringValues.add(new NameValuePair("numbertodial", phoneNumber));
++        queryStringValues.add(new NameValuePair("externalId", externalId));
++        queryStringValues.add(new NameValuePair("phonenum", callRequest.getPhone()));
++        queryStringValues.add(new NameValuePair("vxml", callRequest.getVxml()));
++        queryStringValues.add(new NameValuePair("motechid", callRequest.getMotechId()));
++        queryStringValues.add(new NameValuePair("cid", callRequest.getCallerId()));
++        
++        int callTimeOut = callRequest.getTimeOut();
+         if (0 != callTimeOut) {
+-            queryStringValues.add(new NameValuePair("calltimeout", Integer.toString(callTimeOut)));
++            queryStringValues.add(new NameValuePair("timeout", Integer.toString(callTimeOut) + "s"));
+         }
++        
+         getMethod.setQueryString(queryStringValues.toArray(new NameValuePair[queryStringValues.size()]));
+         return getMethod;
+     }
+diff --git a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java
+index f7a525a..7b9551e 100644
+--- a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java
++++ b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java
+@@ -1,5 +1,6 @@
+ package org.motechproject.server.voxeo.domain;
+ 
++import org.codehaus.jackson.annotate.JsonIgnore;
+ import org.codehaus.jackson.annotate.JsonProperty;
+ import org.ektorp.support.TypeDiscriminator;
+ import org.motechproject.decisiontree.server.domain.CallDetailRecord;
+@@ -80,6 +81,7 @@ public class PhoneCall extends MotechBaseDataObject {
+         this.answerDate = answerDate;
+     }
+ 
++    @JsonIgnore
+     public Integer getDuration() {
+         if (null == endDate || null == startDate) {
+             return null;
+diff --git a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java
+index c56d01d..b818b18 100644
+--- a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java
++++ b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java
+@@ -36,6 +36,7 @@ public class IvrController extends MultiActionController {
+     @Autowired
+     private EventRelay eventRelay;
+ 
++    @Autowired
+     private AllPhoneCalls allPhoneCalls;
+ 
+     @Autowired
+diff --git a/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml b/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml
+index c4a3e2a..5e7155c 100644
+--- a/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml
++++ b/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml
+@@ -40,4 +40,16 @@
+ 
+     <bean class="org.motechproject.event.listener.annotations.EventAnnotationBeanPostProcessor"/>
+ 
++    <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
++        <property name="resourceLoaderPath" value="classpath:/vm" />
++        <property name="preferFileSystemAccess" value="false" />
++    </bean>
++
++    <bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
++        <property name="cache" value="false" />
++        <property name="prefix" value="" />
++        <property name="suffix" value=".vm" />
++        <property name="exposeSpringMacroHelpers" value="true" />
++    </bean>
++
+ </beans>
+\ No newline at end of file
+diff --git a/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm b/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm
+index 81b3bb0..22ac887 100644
+--- a/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm
++++ b/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm
+@@ -1,4 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
++
++#set($event = 'event$')
++
+ <ccxml version="1.0">
+   <log expr="'**** SCRIPT START ****'"/>
+ 
+@@ -41,6 +44,7 @@
+     <var name="phonenum" expr="session.values.phonenum"/>
+     <var name="cid" expr="session.values.cid"/>
+     <var name="vxml" expr="session.values.vxml"/>
++    <var name="motechid" expr="session.values.motechid"/>
+     <var name="externalId" expr="session.values.externalId"/>
+ 
+     <if cond="typeof session.values.timeout !== 'undefined'">
+@@ -65,7 +69,7 @@
+         <assign name="app_state" expr="'outgoing'"/>
+         <log expr="'*** PLACING CALL ***'"/>
+ 
+-        <createcall dest="'tel:+' + session.values.phonenum" callerid="session.values.cid" timeout="call_timeout"/>
++        <createcall dest="'tel:' + session.values.phonenum" callerid="session.values.cid" timeout="call_timeout"/>
+       </if>
+     </transition>
+ 
+@@ -73,10 +77,10 @@
+     <transition state="incoming" event="connection.alerting">
+       <log expr="'*** CONNECTION.ALERTING ***'"/>
+ 
+-      <assign name="callId" expr="event$.connectionid"/>
++      <assign name="callId" expr="${event}.connectionid"/>
+ 
+       <var name="status" expr="'ALERTING'"/>
+-      <assign name="application.callerId" expr="event$.connection.remote"/>
++      <assign name="application.callerId" expr="${event}.connection.remote"/>
+       <var name="timestamp" expr="(+new Date)"/>
+       <send target="base_url + '/ivr/incoming'" targettype="'basichttp'" name="'http.get'" namelist="session.id status application.callerId timestamp"/>
+ 
+@@ -122,12 +126,12 @@
+     <transition state="outgoing" event="connection.progressing">
+       <log expr="'***** CONNECTION PROGRESSING *****'"/>
+ 
+-      <assign name="callId" expr="event$.connectionid"/>
++      <assign name="callId" expr="${event}.connectionid"/>
+ 
+       <var name="status" expr="'PROGRESSING'"/>
+-      <assign name="application.callerId" expr="event$.connection.remote"/>
++      <assign name="application.callerId" expr="${event}.connection.remote"/>
+       <var name="timestamp" expr="(+new Date)"/>
+-      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
++      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
+     </transition>
+ 
+     <transition state="outgoing" event="connection.connected">
+@@ -135,8 +139,9 @@
+ 
+       <var name="status" expr="'CONNECTED'"/>
+       <var name="timestamp" expr="(+new Date)"/>
+-      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
+-      <dialogstart src="vxml" type="'application/voicexml+xml'"/>
++
++      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
++      <dialogstart src="vxml" namelist="motechid phonenum" type="'application/voicexml+xml'"/>
+     </transition>
+ 
+     <transition state="outgoing" event="dialog.started">
+@@ -144,7 +149,7 @@
+ 
+       <var name="status" expr="'DIALOG_STARTED'"/>
+       <var name="timestamp" expr="(+new Date)"/>
+-      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
++      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
+     </transition>
+ 
+     <transition state="outgoing" event="dialog.exit">
+@@ -152,7 +157,7 @@
+ 
+       <var name="status" expr="'DIALOG_EXIT'"/>
+       <var name="timestamp" expr="(+new Date)"/>
+-      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
++      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
+ 
+       <disconnect connectionid="callId"/>
+     </transition>
+@@ -162,16 +167,16 @@
+ 
+       <var name="status" expr="'DISCONNECTED'"/>
+       <var name="timestamp" expr="(+new Date)"/>
+-      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
++      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
+     </transition>
+ 
+     <transition state="outgoing" event="connection.failed">
+       <log expr="'***** CONNECTION FAILED *****'"/>
+ 
+       <var name="status" expr="'FAILED'"/>
+-      <var name="reason" expr="event$.reason"/>
++      <var name="reason" expr="${event}.reason"/>
+       <var name="timestamp" expr="(+new Date)"/>
+-      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status reason application.callerId timestamp"/>
++      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status reason application.callerId timestamp"/>
+     </transition>
+ 
+     <transition event="TIMEOUT_REACHED">
+diff --git a/modules/pillreminder/api-bundle/pom.xml b/modules/pillreminder/api-bundle/pom.xml
+index 365c048..b0f85c5 100644
+--- a/modules/pillreminder/api-bundle/pom.xml
++++ b/modules/pillreminder/api-bundle/pom.xml
+@@ -131,8 +131,9 @@
+                 <configuration>
+                     <instructions>
+                         <Export-Package>
+-                            org.motechproject.pillreminder.api,
+-                            org.motechproject.pillreminder.api.model
++                            org.motechproject.server.pillreminder.api,
++                            org.motechproject.server.pillreminder.api.contract,
++                            org.motechproject.server.pillreminder.api.service
+                         </Export-Package>
+                         <Bundle-Activator>
+                             org.motechproject.server.pillreminder.api.osgi.Activator
+diff --git a/modules/pillreminder/api-bundle/src/main/resources/applicationPillReminderAPIBundle.xml b/modules/pillreminder/api-bundle/src/main/resources/applicationPillReminderAPIBundle.xml
+index b8e0176..ea0d805 100644
+--- a/modules/pillreminder/api-bundle/src/main/resources/applicationPillReminderAPIBundle.xml
++++ b/modules/pillreminder/api-bundle/src/main/resources/applicationPillReminderAPIBundle.xml
+@@ -1,20 +1,21 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+-<beans xmlns="http://www.springframework.org/schema/beans"
+-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-       xmlns:osgi="http://www.springframework.org/schema/osgi"
+-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
++<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
++    xmlns:osgi="http://www.springframework.org/schema/osgi"
++    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/osgi http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+ 
+-    <import resource="classpath*:META-INF/motech/*.xml"/>
++    <import resource="classpath*:META-INF/motech/*.xml" />
++
++    <osgi:service id="pillReminderServiceOsgi" ref="pillReminderService"
++        interface="org.motechproject.server.pillreminder.api.service.PillReminderService" />
+ 
+     <osgi:reference id="schedulerServiceOsgi" cardinality="0..1"
+-                    interface="org.motechproject.scheduler.MotechSchedulerService" />
++        interface="org.motechproject.scheduler.MotechSchedulerService" />
+ 
+-    <osgi:reference id="eventRelayOsgi" cardinality="0..1"
+-                    interface="org.motechproject.event.listener.EventRelay" />
++    <osgi:reference id="eventRelayOsgi" cardinality="0..1" interface="org.motechproject.event.listener.EventRelay" />
+ 
+     <osgi:reference id="platformSettingsServiceOsgi" interface="org.motechproject.server.config.service.PlatformSettingsService" />
+ 
+-    <osgi:reference id="eventListenerRegistryServiceOsgi" interface="org.motechproject.event.listener.EventListenerRegistryService"/>
++    <osgi:reference id="eventListenerRegistryServiceOsgi" interface="org.motechproject.event.listener.EventListenerRegistryService" />
+ 
+ </beans>
+\ No newline at end of file
+diff --git a/modules/pillreminder/api/src/main/java/org/motechproject/server/pillreminder/api/service/PillReminderServiceImpl.java b/modules/pillreminder/api/src/main/java/org/motechproject/server/pillreminder/api/service/PillReminderServiceImpl.java
+index febefb5..ee199aa 100644
+--- a/modules/pillreminder/api/src/main/java/org/motechproject/server/pillreminder/api/service/PillReminderServiceImpl.java
++++ b/modules/pillreminder/api/src/main/java/org/motechproject/server/pillreminder/api/service/PillReminderServiceImpl.java
+@@ -10,7 +10,7 @@ import org.motechproject.server.pillreminder.api.domain.PillRegimen;
+ import org.springframework.beans.factory.annotation.Autowired;
+ import org.springframework.stereotype.Component;
+ 
+-@Component
++@Component("pillReminderService")
+ public class PillReminderServiceImpl implements PillReminderService {
+     private AllPillRegimens allPillRegimens;
+     private PillRegimenJobScheduler pillRegimenJobScheduler;

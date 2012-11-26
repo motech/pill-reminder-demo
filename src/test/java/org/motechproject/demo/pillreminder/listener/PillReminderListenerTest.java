@@ -9,6 +9,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.motechproject.demo.pillreminder.PillReminderSettings;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.ivr.service.CallRequest;
@@ -25,13 +26,16 @@ public class PillReminderListenerTest {
 
     @Mock
     private MrsEntityFinder mrsEntityFinder;
+    
+    @Mock
+    private PillReminderSettings settings;
 
     private PillReminderListener listener;
 
     @Before
     public void setUp() {
         initMocks(this);
-        listener = new PillReminderListener(ivrService, mrsEntityFinder);
+        listener = new PillReminderListener(ivrService, mrsEntityFinder, settings);
     }
 
     @Test

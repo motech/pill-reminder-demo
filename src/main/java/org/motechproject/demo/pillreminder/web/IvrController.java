@@ -3,7 +3,9 @@ package org.motechproject.demo.pillreminder.web;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.motechproject.demo.pillreminder.PillReminderSettings;
 import org.motechproject.demo.pillreminder.service.DecisionTreeSessionHandler;
+import org.motechproject.server.config.SettingsFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +15,12 @@ import org.springframework.web.servlet.ModelAndView;
 public class IvrController {
 
     private DecisionTreeSessionHandler reminder;
+    private PillReminderSettings settings;
 
     @Autowired
-    public IvrController(DecisionTreeSessionHandler reminder) {
+    public IvrController(DecisionTreeSessionHandler reminder, PillReminderSettings settings) {
         this.reminder = reminder;
+        this.settings = settings;
     }
 
     /**
@@ -31,6 +35,7 @@ public class IvrController {
         String sessionId = reminder.registerNewDecisionTreeSession(phoneNum, motechId);
 
         ModelAndView view = reminder.generateSecurityPinViewForSession(sessionId);
+        view.addObject("path", settings.getMotechUrl());
         view.addObject("sessionId", sessionId);
 
         return view;
