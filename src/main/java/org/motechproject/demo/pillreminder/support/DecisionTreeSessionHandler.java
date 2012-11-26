@@ -1,4 +1,4 @@
-package org.motechproject.demo.pillreminder.service;
+package org.motechproject.demo.pillreminder.support;
 
 import java.util.List;
 

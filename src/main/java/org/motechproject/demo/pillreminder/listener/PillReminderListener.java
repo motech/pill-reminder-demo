@@ -2,7 +2,6 @@ package org.motechproject.demo.pillreminder.listener;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.motechproject.demo.pillreminder.PillReminderSettings;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
 import org.motechproject.event.MotechEvent;
@@ -39,8 +38,6 @@ public class PillReminderListener {
 
     @MotechListener(subjects = EventKeys.PILLREMINDER_REMINDER_EVENT_SUBJECT)
     public void handlePillReminderEvent(MotechEvent motechEvent) {
-
-
         if (maxRetryCountReached(motechEvent, settings.getMaxRetryCount())) {
             return;
         }
@@ -65,7 +62,7 @@ public class PillReminderListener {
         callRequest.setVxml(settings.getMotechUrl() + "/module/pillreminder-demo/ivr");
         callRequest.setMotechId(motechId);
         callRequest.setCallerId(settings.getCallerId());
-        
+
         ivrService.initiateCall(callRequest);
     }
 

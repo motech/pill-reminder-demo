@@ -1,4 +1,4 @@
-package org.motechproject.demo.pillreminder;
+package org.motechproject.demo.pillreminder.support;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -13,7 +13,7 @@ import org.motechproject.decisiontree.core.FlowSession;
 import org.motechproject.decisiontree.server.service.DecisionTreeServer;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
-import org.motechproject.demo.pillreminder.service.DecisionTreeSessionHandler;
+import org.motechproject.demo.pillreminder.support.DecisionTreeSessionHandler;
 import org.motechproject.mrs.model.Attribute;
 import org.motechproject.mrs.model.MRSPatient;
 import org.motechproject.mrs.model.MRSPerson;

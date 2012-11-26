@@ -1,4 +1,4 @@
-package org.motechproject.demo.pillreminder.mrs;
+package org.motechproject.demo.pillreminder.support;
 
 import org.motechproject.decisiontree.core.FlowSession;
 import org.motechproject.decisiontree.core.model.INodeOperation;

@@ -5,7 +5,6 @@ import org.motechproject.decisiontree.core.model.INodeOperation;
 import org.motechproject.decisiontree.core.model.ITransition;
 import org.motechproject.decisiontree.core.model.Node;
 import org.motechproject.decisiontree.core.model.TextToSpeechPrompt;
-import org.motechproject.demo.pillreminder.mrs.UpdateMrsOperation;
 import org.motechproject.event.listener.EventRelay;
 import org.springframework.beans.factory.annotation.Autowired;
 

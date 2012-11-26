@@ -1,18 +1,18 @@
 var pillReminderModule = angular.module("pillReminder", ["ngResource"]);
 
 function TabController($scope) {
-  $scope.templateUrl = "search";
+  $scope.templateUrl = "enroll";
   $scope.searchSelected = "active";
   $scope.pillReminderListSelected = "";
   
   $scope.switchToListing = function() {
-    $scope.templateUrl = "enrollment-listing";
+    $scope.templateUrl = "search";
     $scope.searchSelected = "";
     $scope.pillReminderListSelected = "active";
   }
   
   $scope.switchToSearch = function() {
-    $scope.templateUrl = "search";
+    $scope.templateUrl = "enroll";
     $scope.searchSelected = "active";
     $scope.pillReminderListSelected = "";
   }
@@ -42,13 +42,13 @@ function PillReminderDemoController($scope, $resource) {
   $scope.enroll = function() {
   	$scope.errors = [];
   	
-  	var pinPattern = /[0-9]{4}/;
-  	if ($scope.pinnumber.length < 4 || !pinPattern.test($scope.pinnumber)) {
+  	var pinPattern = /^[0-9]{4}$/;
+  	if (!pinPattern.test($scope.pinnumber)) {
   		$scope.errors.push("Pin number must be 4 digits");
   	}
 
-	var phonePattern = /[1-9][0-9]{9}/;
-	if ($scope.phonenumber.length < 10 || !phonePattern.test($scope.phonenumber)) {
+	var phonePattern = /^[1-9][0-9]{9}$/;
+	if (!phonePattern.test($scope.phonenumber)) {
 		$scope.errors.push("Phone number must be 10 digits, and not start with 0");
 	}
 	

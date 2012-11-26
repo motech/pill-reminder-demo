@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MrsPillTakenListener {
+public class UpdateMrsListener {
 
     private MrsEncounterUpdater encounterUpdater;
 
     @Autowired
-    public MrsPillTakenListener(MrsEncounterUpdater encounterUpdater) {
+    public UpdateMrsListener(MrsEncounterUpdater encounterUpdater) {
         this.encounterUpdater = encounterUpdater;
     }
 

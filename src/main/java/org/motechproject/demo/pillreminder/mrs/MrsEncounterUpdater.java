@@ -16,6 +16,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class MrsEncounterUpdater {
 
+    private static final String PILL_TAKEN_CONCEPT_ANSWER = "TRUE";
+    private static final String PILL_REMINDER_ENCOUNTER_TYPE = "PILL REMINDER";
+    private static final String PILL_TAKEN_CONCEPT_NAME = "PILL TAKEN";
+    
     private final MrsEntityFinder mrsEntityFinder;
     private final MRSEncounterAdapter encounterAdapter;
 
@@ -38,13 +42,13 @@ public class MrsEncounterUpdater {
         MRSFacility facility = mrsEntityFinder.findMotechFacility();
 
         MRSEncounter encounter = new MRSEncounter.MRSEncounterBuilder().withDate(new Date()).withObservations(allObs)
-                .withFacility(facility).withEncounterType("PILL REMINDER").withProvider(user.getPerson())
+                .withFacility(facility).withEncounterType(PILL_REMINDER_ENCOUNTER_TYPE).withProvider(user.getPerson())
                 .withPatient(patient).build();
         return encounter;
     }
 
     private Set<MRSObservation> createObservationGroup() {
-        MRSObservation obs = new MRSObservation(new Date(), "Taken Pill", "TRUE");
+        MRSObservation obs = new MRSObservation(new Date(), PILL_TAKEN_CONCEPT_NAME, PILL_TAKEN_CONCEPT_ANSWER);
         Set<MRSObservation> allObs = new HashSet<>();
         allObs.add(obs);
         return allObs;

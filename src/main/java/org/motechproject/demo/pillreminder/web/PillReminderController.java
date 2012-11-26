@@ -56,14 +56,14 @@ public class PillReminderController {
         return scheme + "://" + host + contextPath;
     }
 
-    @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public ModelAndView getSearchPartial(HttpServletRequest request) {
-        return modelWithPath("search", request);
+    @RequestMapping(value = "/enroll", method = RequestMethod.GET)
+    public ModelAndView getEnrollPartial(HttpServletRequest request) {
+        return modelWithPath("enroll", request);
     }
 
-    @RequestMapping(value = "enrollment-listing", method = RequestMethod.GET)
-    public ModelAndView getEnrollmentListingPartial(HttpServletRequest request) {
-        return new ModelAndView("enrollment-listing");
+    @RequestMapping(value = "/search", method = RequestMethod.GET)
+    public ModelAndView getSearchPartial(HttpServletRequest request) {
+        return new ModelAndView("search");
     }
 
     @RequestMapping(value = "/enrollment", method = RequestMethod.POST)
