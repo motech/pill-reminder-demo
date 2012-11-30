@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PillReminderEnroller {
 
+    private static final int REMINDER_RETRY_INTERVAL_IN_MINUTES = 4;
     private static final int REMINDER_BUFFER_TIME = 1;
     private final PillReminderService pillReminderService;
     private final MRSPatientAdapter patientAdapter;
@@ -43,7 +44,7 @@ public class PillReminderEnroller {
             response.addError("Patient is already enrolled in Pill Reminder Regimen.");
             return response;
         }
-        
+
         MRSPatient patient = patientAdapter.getPatientByMotechId(request.getMotechId());
         if (patient == null) {
             response.addError("No MRS Patient Found with id: " + request.getMotechId());
@@ -62,8 +63,8 @@ public class PillReminderEnroller {
         }
 
         DosageRequest dosageRequest = buildDosageRequest(request.getDosageStartTime());
-        DailyPillRegimenRequest regimenRequest = new DailyPillRegimenRequest(request.getMotechId(), 1, 5,
-                REMINDER_BUFFER_TIME, Arrays.asList(dosageRequest));
+        DailyPillRegimenRequest regimenRequest = new DailyPillRegimenRequest(request.getMotechId(), 1,
+                REMINDER_RETRY_INTERVAL_IN_MINUTES, REMINDER_BUFFER_TIME, Arrays.asList(dosageRequest));
 
         pillReminderService.createNew(regimenRequest);
 
