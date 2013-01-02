@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.commons.date.util.DateUtil;
 import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
 import org.motechproject.mrs.model.Attribute;
@@ -24,7 +25,6 @@ import org.motechproject.server.pillreminder.api.contract.DailyPillRegimenReques
 import org.motechproject.server.pillreminder.api.contract.DosageRequest;
 import org.motechproject.server.pillreminder.api.contract.PillRegimenResponse;
 import org.motechproject.server.pillreminder.api.service.PillReminderService;
-import org.motechproject.util.DateUtil;
 
 public class PillReminderEnrollerTest {
 

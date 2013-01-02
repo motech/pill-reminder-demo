@@ -1,6 +1,7 @@
 package org.motechproject.demo.pillreminder.listener;
 
 import java.util.List;
+import java.util.Map;
 
 import org.motechproject.demo.pillreminder.PillReminderSettings;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
@@ -56,12 +57,13 @@ public class PillReminderListener {
     }
 
     private void initiateCall(String motechId, String phonenum) {
+        String callbackUrl = settings.getMotechUrl() + "/module/pillreminder-demo/ivr";
+        CallRequest callRequest = new CallRequest(phonenum, 120, callbackUrl);
 
-        CallRequest callRequest = new CallRequest(phonenum, 120, "none");
-        callRequest.getPayload().put(VoxeoIVRService.APPLICATION_NAME, PILLREMINDER_PROPERTY);
-        callRequest.setVxml(settings.getMotechUrl() + "/module/pillreminder-demo/ivr");
-        callRequest.setMotechId(motechId);
-        callRequest.setCallerId(settings.getCallerId());
+        Map<String, String> payload = callRequest.getPayload();
+        payload.put(VoxeoIVRService.APPLICATION_NAME, PILLREMINDER_PROPERTY);
+        payload.put(VoxeoIVRService.MOTECH_ID, motechId);
+        payload.put(VoxeoIVRService.CALLER_ID, settings.getCallerId());
 
         ivrService.initiateCall(callRequest);
     }

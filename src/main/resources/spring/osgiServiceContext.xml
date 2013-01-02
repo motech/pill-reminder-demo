@@ -16,7 +16,7 @@
     <osgi:reference cardinality="0..1" id="mrsEncounterAdapterOsgi" interface="org.motechproject.mrs.services.MRSEncounterAdapter" />
 
     <osgi:reference cardinality="0..1" id="decisionTreeServiceOsgi"
-        interface="org.motechproject.decisiontree.server.service.DecisionTreeService" />
+        interface="org.motechproject.decisiontree.core.DecisionTreeService" />
 
     <osgi:reference cardinality="0..1" id="decisionTreeServerOsgi"
         interface="org.motechproject.decisiontree.server.service.DecisionTreeServer" />

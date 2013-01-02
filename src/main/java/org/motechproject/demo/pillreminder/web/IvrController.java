@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.motechproject.demo.pillreminder.PillReminderSettings;
 import org.motechproject.demo.pillreminder.support.DecisionTreeSessionHandler;
+import org.motechproject.ivr.service.IVRService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,9 @@ public class IvrController {
 
     private DecisionTreeSessionHandler reminder;
     private PillReminderSettings settings;
+    
+    @Autowired
+    IVRService ivrService;
 
     @Autowired
     public IvrController(DecisionTreeSessionHandler reminder, PillReminderSettings settings) {

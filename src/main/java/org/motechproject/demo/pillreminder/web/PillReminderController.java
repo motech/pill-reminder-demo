@@ -3,6 +3,7 @@ package org.motechproject.demo.pillreminder.web;
 import javax.servlet.http.HttpServletRequest;
 
 import org.joda.time.DateTime;
+import org.motechproject.commons.date.util.DateUtil;
 import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
 import org.motechproject.demo.pillreminder.domain.MrsPatientSearchResult;
@@ -10,7 +11,6 @@ import org.motechproject.demo.pillreminder.domain.PillReminderResponse;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
 import org.motechproject.demo.pillreminder.support.PillReminderEnroller;
 import org.motechproject.demo.pillreminder.support.PillReminders;
-import org.motechproject.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;

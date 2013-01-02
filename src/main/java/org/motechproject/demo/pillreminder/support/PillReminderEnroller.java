@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.joda.time.DateTime;
+import org.motechproject.commons.date.util.DateUtil;
 import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
 import org.motechproject.mrs.model.Attribute;
@@ -15,7 +16,6 @@ import org.motechproject.server.pillreminder.api.contract.DosageRequest;
 import org.motechproject.server.pillreminder.api.contract.MedicineRequest;
 import org.motechproject.server.pillreminder.api.contract.PillRegimenResponse;
 import org.motechproject.server.pillreminder.api.service.PillReminderService;
-import org.motechproject.util.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
