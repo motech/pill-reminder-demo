@@ -1,0 +1,18 @@
+The following changes were made to files in $HOME/.motech/config
+
+File: org.motechproject.motech-pillreminder-demo-bundle/pillreminder-demo.properties
+  motech.url=http\://YOUR_SERVER_HERE/motech-platform-server
+  
+File: org.motechproject.motech-commcare-api-bundle/caseEventStrategy.properties
+  case.events.send.with.all.data=full
+  
+File: org.motechproject.motech-ivr-voxeo-bundle/raw/voxeo-config.json
+{
+    "serverUrl":"http://api.voxeo.net/SessionControl/4.5.41/CCXML10.start",
+    "applications":{
+        "pillreminder":"YOUR KEY HERE"
+    }
+}
+
+File: org.motechproject.motech-openmrs-ws-bundle/openmrs.properties
+  Set to your OpenMRS instance and credentials
