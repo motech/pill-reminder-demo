@@ -1,6 +1,5 @@
 package org.motechproject.demo.pillreminder;
 
-import org.apache.commons.lang.StringUtils;
 import org.motechproject.server.config.SettingsFacade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ public class PillReminderSettings {
 
     private static final String MAX_RETRY_COUNT_PROPERTY = "max.reminder.retry";
     private static final String MOTECH_URL_PROPERTY = "motech.url";
-    private static final String CALLER_ID_PROPERTY = "caller.id";
+    private static final String VERBOICE_CHANNEL_NAME_PROPERTY = "verboice.channel.name";
 
     private SettingsFacade settingsFacade;
 
@@ -37,15 +36,7 @@ public class PillReminderSettings {
         return maxRetryCount;
     }
 
-    public String getCallerId() {
-        String callerId = "";
-        if (StringUtils.isNotBlank(settingsFacade.getProperty(CALLER_ID_PROPERTY))) {
-            callerId = settingsFacade.getProperty(CALLER_ID_PROPERTY);
-        }
-        return callerId;
-    }
-
     public String getVerboiceChannelName() {
-        return settingsFacade.getProperty("verboice.channel.name");
+        return settingsFacade.getProperty(VERBOICE_CHANNEL_NAME_PROPERTY);
     }
 }

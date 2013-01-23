@@ -5,14 +5,9 @@ File: org.motechproject.motech-pillreminder-demo-bundle/pillreminder-demo.proper
   
 File: org.motechproject.motech-commcare-api-bundle/caseEventStrategy.properties
   case.events.send.with.all.data=full
-  
-File: org.motechproject.motech-ivr-voxeo-bundle/raw/voxeo-config.json
-{
-    "serverUrl":"http://api.voxeo.net/SessionControl/4.5.41/CCXML10.start",
-    "applications":{
-        "pillreminder":"YOUR KEY HERE"
-    }
-}
 
 File: org.motechproject.motech-openmrs-ws-bundle/openmrs.properties
   Set to your OpenMRS instance and credentials
+
+File: org.motechproject.motech-ivr-verboice-bundle/verboice.properties
+  Set to your Verboice instance and credentials

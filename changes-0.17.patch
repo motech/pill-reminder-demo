@@ -1,292 +1,50 @@
-diff --git a/modules/commcare/api/src/main/java/org/motechproject/commcare/web/CasesController.java b/modules/commcare/api/src/main/java/org/motechproject/commcare/web/CasesController.java
-index 585043e..e822879 100644
---- a/modules/commcare/api/src/main/java/org/motechproject/commcare/web/CasesController.java
-+++ b/modules/commcare/api/src/main/java/org/motechproject/commcare/web/CasesController.java
-@@ -92,8 +92,7 @@ public class CasesController {
-                 motechCaseEvent = caseEvent.toMotechEventWithData();
-                 motechCaseEvent.getParameters().put("fieldValues",
-                         caseEvent.getFieldValues());
--            }
--            if (caseEventStrategy.equals(PARTIAL_DATA_EVENT)) {
-+            } else if (caseEventStrategy.equals(PARTIAL_DATA_EVENT)) {
-                 motechCaseEvent = caseEvent.toMotechEventWithData();
-             } else {
-                 motechCaseEvent = caseEvent.toMotechEventWithoutData();
-diff --git a/modules/ivr/voxeo-bundle/pom.xml b/modules/ivr/voxeo-bundle/pom.xml
-index 126f0b8..e62b560 100644
---- a/modules/ivr/voxeo-bundle/pom.xml
-+++ b/modules/ivr/voxeo-bundle/pom.xml
-@@ -87,10 +87,12 @@
-                             org.springframework.beans.factory.xml,
-                             org.springframework.context.config,
-                             org.springframework.context.support,
-+                            org.springframework.ui.velocity,
-                             org.springframework.web.context.support,
-                             org.springframework.web.servlet.config,
-                             org.springframework.web.servlet.mvc,
-                             org.springframework.web.servlet.support,
-+                            org.springframework.web.servlet.view.velocity,
-                             org.eclipse.gemini.blueprint.config,
-                             *
-                         </Import-Package>
-diff --git a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java
-index cc7b9d0..c2389b3 100644
---- a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java
-+++ b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/VoxeoIVRService.java
-@@ -1,5 +1,12 @@
- package org.motechproject.server.voxeo;
- 
-+import java.net.MalformedURLException;
-+import java.util.ArrayList;
-+import java.util.Arrays;
-+import java.util.Date;
-+import java.util.List;
-+import java.util.Map.Entry;
+diff --git a/modules/decisiontree/core/src/main/java/org/motechproject/decisiontree/core/model/EventTransition.java b/modules/decisiontree/core/src/main/java/org/motechproject/decisiontree/core/model/EventTransition.java
+new file mode 100644
+index 0000000..8c699b3
+--- /dev/null
++++ b/modules/decisiontree/core/src/main/java/org/motechproject/decisiontree/core/model/EventTransition.java
+@@ -0,0 +1,39 @@
++package org.motechproject.decisiontree.core.model;
 +
- import org.apache.commons.httpclient.HttpClient;
- import org.apache.commons.httpclient.HttpMethod;
- import org.apache.commons.httpclient.NameValuePair;
-@@ -18,11 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.beans.factory.annotation.Qualifier;
- import org.springframework.stereotype.Component;
- 
--import java.net.MalformedURLException;
--import java.util.ArrayList;
--import java.util.Date;
--import java.util.List;
--
- /**
-  * Voxeo specific implementation of the IVR Service interface, supports initiating call given call request.
-  * <p/>
-@@ -32,6 +34,8 @@ import java.util.List;
- @Qualifier("VoxeoIVRService")
- public class VoxeoIVRService implements IVRService {
-     public static final String APPLICATION_NAME = "applicationName";
-+    public static final String MOTECH_ID = "motechid";
-+    public static final String CALLER_ID = "cid";
-     public static final String SUCCESS = "success";
-     private static Logger log = LoggerFactory.getLogger(VoxeoIVRService.class);
- 
-@@ -72,9 +76,10 @@ public class VoxeoIVRService implements IVRService {
- 
-         String voxeoURL = voxeoConfig.getServerUrl();
-         String tokenId = voxeoConfig.getTokenId(callRequest.getPayload().get(APPLICATION_NAME));
-+        String externalId = phoneCall.getId();
- 
-         try {
--            HttpMethod httpMethod = generateRequestFor(voxeoURL, callRequest.getPhone(), tokenId, callRequest.getTimeOut());
-+            HttpMethod httpMethod = generateRequestFor(voxeoURL, tokenId, externalId, callRequest);
-             int status = commonsHttpClient.executeMethod(httpMethod);
-             String response = httpMethod.getResponseBodyAsString();
-             log.info("HTTP Status:" + status + "|Response:" + response);
-@@ -90,15 +95,27 @@ public class VoxeoIVRService implements IVRService {
-         }
-     }
- 
--    private HttpMethod generateRequestFor(String voxeoUrl, String phoneNumber, String tokenId, int callTimeOut) {
-+    private HttpMethod generateRequestFor(String voxeoUrl, String tokenId, String externalId, CallRequest callRequest) {
-         GetMethod getMethod = new GetMethod(voxeoUrl);
- 
-         List<NameValuePair> queryStringValues = new ArrayList<NameValuePair>();
-         queryStringValues.add(new NameValuePair("tokenid", tokenId));
--        queryStringValues.add(new NameValuePair("numbertodial", phoneNumber));
-+        queryStringValues.add(new NameValuePair("externalId", externalId));
-+        queryStringValues.add(new NameValuePair("phonenum", callRequest.getPhone()));
-+        queryStringValues.add(new NameValuePair("vxml", callRequest.getCallBackUrl()));
++import java.util.HashMap;
++import java.util.Map;
 +
-+        List<String> additionalParameters = Arrays.asList(MOTECH_ID, CALLER_ID);
-+        for (Entry<String, String> param : callRequest.getPayload().entrySet()) {
-+            if (additionalParameters.contains(param.getKey())) {
-+                queryStringValues.add(new NameValuePair(param.getKey(), param.getValue()));
-+            }
-+        }
++import org.motechproject.decisiontree.core.FlowSession;
++import org.motechproject.event.MotechEvent;
++import org.motechproject.event.listener.EventRelay;
++import org.springframework.beans.factory.annotation.Autowired;
 +
-+        int callTimeOut = callRequest.getTimeOut();
-         if (0 != callTimeOut) {
--            queryStringValues.add(new NameValuePair("calltimeout", Integer.toString(callTimeOut)));
-+            queryStringValues.add(new NameValuePair("timeout", Integer.toString(callTimeOut) + "s"));
-         }
++public class EventTransition extends Transition {
 +
-         getMethod.setQueryString(queryStringValues.toArray(new NameValuePair[queryStringValues.size()]));
-         return getMethod;
-     }
-diff --git a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java
-index b074071..3757b6d 100644
---- a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java
-+++ b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/domain/PhoneCall.java
-@@ -1,5 +1,6 @@
- package org.motechproject.server.voxeo.domain;
- 
-+import org.codehaus.jackson.annotate.JsonIgnore;
- import org.codehaus.jackson.annotate.JsonProperty;
- import org.ektorp.support.TypeDiscriminator;
- import org.motechproject.ivr.model.CallDetailRecord;
-@@ -80,6 +81,7 @@ public class PhoneCall extends MotechBaseDataObject {
-         this.answerDate = answerDate;
-     }
- 
-+    @JsonIgnore
-     public Integer getDuration() {
-         if (null == endDate || null == startDate) {
-             return null;
-diff --git a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java
-index c6e59cc..69374bd 100644
---- a/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java
-+++ b/modules/ivr/voxeo/src/main/java/org/motechproject/server/voxeo/web/IvrController.java
-@@ -36,6 +36,7 @@ public class IvrController extends MultiActionController {
-     @Autowired
-     private EventRelay eventRelay;
- 
 +    @Autowired
-     private AllPhoneCalls allPhoneCalls;
- 
-     @Autowired
-diff --git a/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml b/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml
-index 6b11d66..ddb9b2d 100644
---- a/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml
-+++ b/modules/ivr/voxeo/src/main/resources/META-INF/motech/voxeoResources.xml
-@@ -37,4 +37,16 @@
-         </property>
-         <property name="moduleName" value="ivr-voxeo" />
-     </bean>
--</beans>
-\ No newline at end of file
++    private EventRelay eventRelay;
 +
-+    <bean id="velocityConfig" class="org.springframework.web.servlet.view.velocity.VelocityConfigurer">
-+        <property name="resourceLoaderPath" value="classpath:/vm" />
-+        <property name="preferFileSystemAccess" value="false" />
-+    </bean>
++    private String eventSubject;
 +
-+    <bean id="viewResolver" class="org.springframework.web.servlet.view.velocity.VelocityViewResolver">
-+        <property name="cache" value="false" />
-+        <property name="prefix" value="" />
-+        <property name="suffix" value=".vm" />
-+        <property name="exposeSpringMacroHelpers" value="true" />
-+    </bean>
-+</beans>
-diff --git a/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm b/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm
-index 81b3bb0..22ac887 100644
---- a/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm
-+++ b/modules/ivr/voxeo/src/main/resources/vm/ccxml.vm
-@@ -1,4 +1,7 @@
- <?xml version="1.0" encoding="UTF-8"?>
++    public void setEventSubject(String eventSubject) {
++        this.eventSubject = eventSubject;
++    }
 +
-+#set($event = 'event$')
++    public String getEventSubject() {
++        return eventSubject;
++    }
 +
- <ccxml version="1.0">
-   <log expr="'**** SCRIPT START ****'"/>
- 
-@@ -41,6 +44,7 @@
-     <var name="phonenum" expr="session.values.phonenum"/>
-     <var name="cid" expr="session.values.cid"/>
-     <var name="vxml" expr="session.values.vxml"/>
-+    <var name="motechid" expr="session.values.motechid"/>
-     <var name="externalId" expr="session.values.externalId"/>
- 
-     <if cond="typeof session.values.timeout !== 'undefined'">
-@@ -65,7 +69,7 @@
-         <assign name="app_state" expr="'outgoing'"/>
-         <log expr="'*** PLACING CALL ***'"/>
- 
--        <createcall dest="'tel:+' + session.values.phonenum" callerid="session.values.cid" timeout="call_timeout"/>
-+        <createcall dest="'tel:' + session.values.phonenum" callerid="session.values.cid" timeout="call_timeout"/>
-       </if>
-     </transition>
- 
-@@ -73,10 +77,10 @@
-     <transition state="incoming" event="connection.alerting">
-       <log expr="'*** CONNECTION.ALERTING ***'"/>
- 
--      <assign name="callId" expr="event$.connectionid"/>
-+      <assign name="callId" expr="${event}.connectionid"/>
- 
-       <var name="status" expr="'ALERTING'"/>
--      <assign name="application.callerId" expr="event$.connection.remote"/>
-+      <assign name="application.callerId" expr="${event}.connection.remote"/>
-       <var name="timestamp" expr="(+new Date)"/>
-       <send target="base_url + '/ivr/incoming'" targettype="'basichttp'" name="'http.get'" namelist="session.id status application.callerId timestamp"/>
- 
-@@ -122,12 +126,12 @@
-     <transition state="outgoing" event="connection.progressing">
-       <log expr="'***** CONNECTION PROGRESSING *****'"/>
- 
--      <assign name="callId" expr="event$.connectionid"/>
-+      <assign name="callId" expr="${event}.connectionid"/>
- 
-       <var name="status" expr="'PROGRESSING'"/>
--      <assign name="application.callerId" expr="event$.connection.remote"/>
-+      <assign name="application.callerId" expr="${event}.connection.remote"/>
-       <var name="timestamp" expr="(+new Date)"/>
--      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-+      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-     </transition>
- 
-     <transition state="outgoing" event="connection.connected">
-@@ -135,8 +139,9 @@
- 
-       <var name="status" expr="'CONNECTED'"/>
-       <var name="timestamp" expr="(+new Date)"/>
--      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
--      <dialogstart src="vxml" type="'application/voicexml+xml'"/>
++    @Override
++    public Node getDestinationNode(String input, FlowSession session) {
++        raiseEventWithData(session.getSessionId());
++        return super.getDestinationNode(input, session);
++    }
 +
-+      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-+      <dialogstart src="vxml" namelist="motechid phonenum" type="'application/voicexml+xml'"/>
-     </transition>
- 
-     <transition state="outgoing" event="dialog.started">
-@@ -144,7 +149,7 @@
- 
-       <var name="status" expr="'DIALOG_STARTED'"/>
-       <var name="timestamp" expr="(+new Date)"/>
--      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-+      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-     </transition>
- 
-     <transition state="outgoing" event="dialog.exit">
-@@ -152,7 +157,7 @@
- 
-       <var name="status" expr="'DIALOG_EXIT'"/>
-       <var name="timestamp" expr="(+new Date)"/>
--      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-+      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
- 
-       <disconnect connectionid="callId"/>
-     </transition>
-@@ -162,16 +167,16 @@
- 
-       <var name="status" expr="'DISCONNECTED'"/>
-       <var name="timestamp" expr="(+new Date)"/>
--      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-+      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status application.callerId timestamp"/>
-     </transition>
- 
-     <transition state="outgoing" event="connection.failed">
-       <log expr="'***** CONNECTION FAILED *****'"/>
- 
-       <var name="status" expr="'FAILED'"/>
--      <var name="reason" expr="event$.reason"/>
-+      <var name="reason" expr="${event}.reason"/>
-       <var name="timestamp" expr="(+new Date)"/>
--      <send target="base_url + '/ivr/outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status reason application.callerId timestamp"/>
-+      <send target="'outgoing'" targettype="'basichttp'" name="'http.get'" namelist="session.id externalId status reason application.callerId timestamp"/>
-     </transition>
- 
-     <transition event="TIMEOUT_REACHED">
-diff --git a/platform/server/src/main/java/org/motechproject/server/impl/OsgiFrameworkService.java b/platform/server/src/main/java/org/motechproject/server/impl/OsgiFrameworkService.java
-index 95ade9e..cc79fee 100644
---- a/platform/server/src/main/java/org/motechproject/server/impl/OsgiFrameworkService.java
-+++ b/platform/server/src/main/java/org/motechproject/server/impl/OsgiFrameworkService.java
-@@ -80,7 +80,7 @@ public class OsgiFrameworkService implements ApplicationContextAware {
- 
-     private Map<String, String> bundleLocationMapping = new HashMap<String, String>();
- 
--    private static final int THREADS_NUMBER = 10;
-+    private static final int THREADS_NUMBER = 1;
- 
-     private boolean httpServiceRegistered = false;
-     private boolean startupEventReceived = false;
++    private void raiseEventWithData(String sessionId) {
++        Map<String, Object> params = new HashMap<>();
++        params.put("flowSessionId", sessionId);
++        MotechEvent motechEvent = new MotechEvent(eventSubject, params);
++        eventRelay.sendEventMessage(motechEvent);
++    }
++
++}
 diff --git a/platform/web-security/web-security/src/main/resources/META-INF/motech/securityContext.xml b/platform/web-security/web-security/src/main/resources/META-INF/motech/securityContext.xml
-index c67906c..fcf4f09 100644
+index c67906c..b059d84 100644
 --- a/platform/web-security/web-security/src/main/resources/META-INF/motech/securityContext.xml
 +++ b/platform/web-security/web-security/src/main/resources/META-INF/motech/securityContext.xml
 @@ -35,6 +35,9 @@
@@ -294,8 +52,8 @@ index c67906c..fcf4f09 100644
      <security:http pattern="/**/locate*" security="none" />
      <security:http pattern="/**/startup*" security="none" />
 +    <security:http pattern="/**/pillreminder-demo/**" security="none" />
-+    <security:http pattern="/**/voxeo/**" security="none" />
 +    <security:http pattern="/**/commcare/**" security="none" />
++    <security:http pattern="/**/verboice/**" security="none" />
  
      <bean id="securityContextPersistenceFilter" class="org.springframework.security.web.context.SecurityContextPersistenceFilter"/>
  
