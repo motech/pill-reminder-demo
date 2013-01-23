@@ -35,7 +35,7 @@
                     <label>4 Digit Pin Number</label>
                     <input type="text" ng-model="pinnumber" placeholder="1234" maxlength="4" />
                     <label>Phone Number</label>
-                    <input type="text" ng-model="phonenumber" placeholder="2223334444" maxlength="10" />
+                    <input type="text" ng-model="phonenumber" placeholder="12223334444" maxlength="11" />
                     <br />
                     <button type="submit" class="btn btn-warning" ng-click="enroll()" ng-disabled="enrolling">Enroll into Pill Reminder</button>
                 </form>

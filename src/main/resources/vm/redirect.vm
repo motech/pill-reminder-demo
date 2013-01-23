@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+	<Redirect method="GET">$path/module/verboice/verboice/ivr?CallSid=$sessionId&amp;tree=DemoTree&amp;ln=en</Redirect>
+</Response>

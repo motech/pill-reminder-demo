@@ -1,23 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<vxml version="2.1" xmlns="http://www.w3.org/2001/vxml">
-  <form>
-    <var name="sessionId" expr="'$sessionId'" />
-    
-    <field name="securitypin" type="digits?length=4">
-        <prompt>
-            Hello motech demo user. This is a pill reminder. To get started, please enter the 4 digit pin assigned to you.
-        </prompt>
-        
-        <filled>
-            <if cond="securitypin != '$pin'">
-              <prompt>You entered an incorrect pin. Please try again.</prompt>
-              <clear namelist="securitypin" />
-            
-              <else />
-                <prompt>Your pin number has been accepted.</prompt>
-                <submit namelist="sessionId" next="$path/module/pillreminder-demo/decisiontree" />
-            </if>
-        </filled>
-    </field>
-  </form>
-</vxml>
+<Response>
+	<Say>Hello motech demo user. This is a pill reminder. To get started, please enter the 4 digit pin assigned to you.</Say>
+	
+	<Gather action="$path/module/pillreminder-demo/ivr/authenticate?sessionId=$sessionId" 
+			timeout="10" 
+			numDigits="4" />
+			
+	<Say>Unable to capture your response.</Say>
+</Response>

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.motechproject</groupId>
-    <version>${motech.version}</version>
+    <version>0.17-SNAPSHOT</version>
     <artifactId>motech-pillreminder-demo</artifactId>
     <packaging>bundle</packaging>
 

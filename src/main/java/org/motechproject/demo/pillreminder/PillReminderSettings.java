@@ -44,4 +44,8 @@ public class PillReminderSettings {
         }
         return callerId;
     }
+
+    public String getVerboiceChannelName() {
+        return settingsFacade.getProperty("verboice.channel.name");
+    }
 }
