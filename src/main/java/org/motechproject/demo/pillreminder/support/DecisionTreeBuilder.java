@@ -62,7 +62,7 @@ public class DecisionTreeBuilder {
         tree.setName("DemoTree");
         Transition rootTransition = new Transition();
 
-        rootTransition.setDestinationNode(new Node().setPrompts(
+        rootTransition.setDestinationNode(new Node().setNoticePrompts(
                 new Prompt[] {
                         new TextToSpeechPrompt()
                                 .setMessage("Have you taken the recommended dosage of the demo medicine?"),

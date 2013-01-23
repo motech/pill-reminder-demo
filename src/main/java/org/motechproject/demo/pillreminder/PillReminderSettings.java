@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Wrapper around {#link {@link SettingsFacade} to access demo related properties
+ */
 @Component
 public class PillReminderSettings {
     private final Logger logger = LoggerFactory.getLogger(PillReminderSettings.class);

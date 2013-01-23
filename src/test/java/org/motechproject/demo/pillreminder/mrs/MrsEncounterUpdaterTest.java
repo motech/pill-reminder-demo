@@ -17,27 +17,27 @@ import org.motechproject.mrs.services.MRSEncounterAdapter;
 public class MrsEncounterUpdaterTest {
 
     @Mock
-    private MrsEntityFinder mrsEntityFinder;
+    private MrsEntityFacade mrsEntityFacade;
 
     @Mock
     private MRSEncounterAdapter encounterAdapter;
 
-    private MrsEncounterUpdater updater;
+    private MrsEncounterCreator updater;
 
     @Before
     public void setUp() {
         initMocks(this);
-        updater = new MrsEncounterUpdater(mrsEntityFinder, encounterAdapter);
+        updater = new MrsEncounterCreator(mrsEntityFacade, encounterAdapter);
     }
 
     @Test
     public void shouldCreateEncounter() {
-        when(mrsEntityFinder.findPatientByMotechId("700")).thenReturn(new MRSPatient("700"));
-        when(mrsEntityFinder.findMotechFacility()).thenReturn(new MRSFacility(null));
-        when(mrsEntityFinder.findMotechUser()).thenReturn(new MRSUser());
-        
-        updater.addPillTakenEncounterToPatient("700");
-        
+        when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(new MRSPatient("700"));
+        when(mrsEntityFacade.findMotechFacility()).thenReturn(new MRSFacility(null));
+        when(mrsEntityFacade.findMotechUser()).thenReturn(new MRSUser());
+
+        updater.createPillTakenEncounterForPatient("700");
+
         verify(encounterAdapter).createEncounter(any(MRSEncounter.class));
     }
 }

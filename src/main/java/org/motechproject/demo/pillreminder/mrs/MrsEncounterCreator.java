@@ -13,20 +13,23 @@ import org.motechproject.mrs.services.MRSEncounterAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Helper class to create new MRS encounters for patients
+ */
 @Component
-public class MrsEncounterUpdater {
+public class MrsEncounterCreator {
 
-    private final MrsEntityFinder mrsEntityFinder;
+    private final MrsEntityFacade mrsEntityFacade;
     private final MRSEncounterAdapter encounterAdapter;
 
     @Autowired
-    public MrsEncounterUpdater(MrsEntityFinder mrsEntityFinder, MRSEncounterAdapter encounterAdapter) {
-        this.mrsEntityFinder = mrsEntityFinder;
+    public MrsEncounterCreator(MrsEntityFacade mrsEntityFacade, MRSEncounterAdapter encounterAdapter) {
+        this.mrsEntityFacade = mrsEntityFacade;
         this.encounterAdapter = encounterAdapter;
     }
 
-    public void addPillTakenEncounterToPatient(String motechId) {
-        MRSPatient patient = mrsEntityFinder.findPatientByMotechId(motechId);
+    public void createPillTakenEncounterForPatient(String motechId) {
+        MRSPatient patient = mrsEntityFacade.findPatientByMotechId(motechId);
         Set<MRSObservation> allObs = createObservationGroup();
         MRSEncounter encounter = createEncounter(patient, allObs);
 
@@ -34,8 +37,8 @@ public class MrsEncounterUpdater {
     }
 
     private MRSEncounter createEncounter(MRSPatient patient, Set<MRSObservation> allObs) {
-        MRSUser user = mrsEntityFinder.findMotechUser();
-        MRSFacility facility = mrsEntityFinder.findMotechFacility();
+        MRSUser user = mrsEntityFacade.findMotechUser();
+        MRSFacility facility = mrsEntityFacade.findMotechFacility();
 
         MRSEncounter encounter = new MRSEncounter.MRSEncounterBuilder().withDate(new Date()).withObservations(allObs)
                 .withFacility(facility).withEncounterType(MrsConstants.PILL_REMINDER_ENCOUNTER_TYPE)

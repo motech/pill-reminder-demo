@@ -2,31 +2,25 @@ package org.motechproject.demo.pillreminder.support;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.motechproject.decisiontree.core.FlowSession;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
 import org.motechproject.demo.pillreminder.mrs.MrsConstants;
-import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
+import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
 import org.motechproject.mrs.model.Attribute;
 import org.motechproject.mrs.model.MRSPatient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DecisionTreeSessionHandler {
-    public static final String MOTECH_ID_KEY = "motechId";
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    public static final String DEFAULT_PIN = "1234";
-
-    private final MrsEntityFinder mrsEntityFinder;
+    private final MrsEntityFacade mrsEntityFacade;
     private final FlowSessionService flowSessionService;
 
     @Autowired
-    public DecisionTreeSessionHandler(MrsEntityFinder mrsEntityFinder, FlowSessionService flowSessionService) {
-        this.mrsEntityFinder = mrsEntityFinder;
+    public DecisionTreeSessionHandler(MrsEntityFacade mrsEntityFacade, FlowSessionService flowSessionService) {
+        this.mrsEntityFacade = mrsEntityFacade;
         this.flowSessionService = flowSessionService;
     }
 
@@ -41,12 +35,11 @@ public class DecisionTreeSessionHandler {
     }
 
     public boolean digitsMatchPatientPin(String sessionId, String digits) {
-        FlowSession session = flowSessionService.getSession(sessionId);
-        String motechId = session.get(MOTECH_ID_KEY);
-        MRSPatient patient = mrsEntityFinder.findPatientByMotechId(motechId);
+        String motechId = getMotechIdForSessionWithId(sessionId);
+        MRSPatient patient = mrsEntityFacade.findPatientByMotechId(motechId);
         String pin = readPinAttributeValue(patient);
 
-        if (digits.equals(pin)) {
+        if (StringUtils.isNotBlank(digits) && digits.equals(pin)) {
             return true;
         } else {
             return false;
@@ -63,10 +56,10 @@ public class DecisionTreeSessionHandler {
         }
         return pin;
     }
-    
+
     public String getMotechIdForSessionWithId(String sessionId) {
         FlowSession session = flowSessionService.getSession(sessionId);
-        return session.get(DecisionTreeSessionHandler.MOTECH_ID_KEY);
+        return session.get(CallRequestDataKeys.MOTECH_ID);
     }
 
 }

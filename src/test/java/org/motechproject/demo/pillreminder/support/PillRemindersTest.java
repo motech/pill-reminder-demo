@@ -29,7 +29,7 @@ public class PillRemindersTest {
     @Before
     public void setUp() {
         initMocks(this);
-        pillReminders = new PillReminders(pillReminderService);
+        pillReminders = new PillRemindersImpl(pillReminderService);
     }
 
     @Test

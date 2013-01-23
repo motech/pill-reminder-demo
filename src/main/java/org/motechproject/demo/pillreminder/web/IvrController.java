@@ -15,7 +15,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/ivr")
 public class IvrController {
 
-    private DecisionTreeSessionHandler reminder;
+    private DecisionTreeSessionHandler decisionTreeSessionHandler;
     private PillReminderSettings settings;
 
     @Autowired
@@ -25,16 +25,9 @@ public class IvrController {
     FlowSessionService flowSessionService;
 
     @Autowired
-    public IvrController(DecisionTreeSessionHandler reminder, PillReminderSettings settings) {
-        this.reminder = reminder;
+    public IvrController(DecisionTreeSessionHandler decisionTreeSessionHandler, PillReminderSettings settings) {
+        this.decisionTreeSessionHandler = decisionTreeSessionHandler;
         this.settings = settings;
-    }
-
-    @RequestMapping("/test")
-    public ModelAndView testMethod() {
-        flowSessionService.findOrCreate("1234", "2079075885");
-
-        return null;
     }
 
     /**
@@ -45,12 +38,12 @@ public class IvrController {
      * identifier, we must update the flow session to use this value.
      */
     @RequestMapping("/start")
-    public ModelAndView generateVxml(HttpServletRequest request) {
+    public ModelAndView generateSecurityPinTwiML(HttpServletRequest request) {
         String verboiceId = request.getParameter("CallSid");
         String motechId = request.getParameter("motech_call_id");
         ModelAndView view = new ModelAndView("security-pin");
 
-        reminder.updateFlowSessionIdToVerboiceId(motechId, verboiceId);
+        decisionTreeSessionHandler.updateFlowSessionIdToVerboiceId(motechId, verboiceId);
 
         view.addObject("path", settings.getMotechUrl());
         view.addObject("sessionId", verboiceId);
@@ -71,7 +64,7 @@ public class IvrController {
         String digits = request.getParameter("Digits");
 
         ModelAndView view = null;
-        if (reminder.digitsMatchPatientPin(sessionId, digits)) {
+        if (decisionTreeSessionHandler.digitsMatchPatientPin(sessionId, digits)) {
             view = new ModelAndView("redirect");
             view.addObject("path", settings.getMotechUrl());
             view.addObject("sessionId", sessionId);

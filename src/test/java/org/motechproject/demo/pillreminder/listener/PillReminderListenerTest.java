@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.demo.pillreminder.PillReminderSettings;
-import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
+import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.ivr.service.CallRequest;
 import org.motechproject.ivr.service.IVRService;
@@ -25,8 +25,8 @@ public class PillReminderListenerTest {
     private IVRService ivrService;
 
     @Mock
-    private MrsEntityFinder mrsEntityFinder;
-    
+    private MrsEntityFacade mrsEntityFacade;
+
     @Mock
     private PillReminderSettings settings;
 
@@ -35,7 +35,7 @@ public class PillReminderListenerTest {
     @Before
     public void setUp() {
         initMocks(this);
-        listener = new PillReminderListener(ivrService, mrsEntityFinder, settings);
+        listener = new PillReminderListener(ivrService, mrsEntityFacade, settings);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class PillReminderListenerTest {
         MRSPerson person = new MRSPerson();
         MRSPatient patient = new MRSPatient(null, person, null);
 
-        when(mrsEntityFinder.findPatientByMotechId("700")).thenReturn(patient);
+        when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(patient);
 
         MotechEvent motechEvent = new MotechEvent();
         motechEvent.getParameters().put(EventKeys.PILLREMINDER_TIMES_SENT, "0");
@@ -60,7 +60,7 @@ public class PillReminderListenerTest {
         person.getAttributes().add(new Attribute("Phone Number", "555"));
         MRSPatient patient = new MRSPatient(null, person, null);
 
-        when(mrsEntityFinder.findPatientByMotechId("700")).thenReturn(patient);
+        when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(patient);
 
         MotechEvent motechEvent = new MotechEvent();
         motechEvent.getParameters().put(EventKeys.PILLREMINDER_TIMES_SENT, "1");

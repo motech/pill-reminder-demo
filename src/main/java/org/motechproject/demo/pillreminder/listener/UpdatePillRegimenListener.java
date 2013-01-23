@@ -1,28 +1,25 @@
 package org.motechproject.demo.pillreminder.listener;
 
-import java.util.List;
-
-import org.joda.time.LocalDate;
 import org.motechproject.demo.pillreminder.events.Events;
 import org.motechproject.demo.pillreminder.support.DecisionTreeSessionHandler;
+import org.motechproject.demo.pillreminder.support.PillReminders;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.annotations.MotechListener;
-import org.motechproject.server.pillreminder.api.contract.DosageResponse;
-import org.motechproject.server.pillreminder.api.contract.PillRegimenResponse;
-import org.motechproject.server.pillreminder.api.service.PillReminderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * MOTECH Listener that updates the daily pill regimen dosage status
+ */
 @Component
 public class UpdatePillRegimenListener {
 
-    private PillReminderService pillReminderService;
+    private PillReminders pillReminders;
     private DecisionTreeSessionHandler decisionTreeSessionHandler;
 
     @Autowired
-    public UpdatePillRegimenListener(PillReminderService pillReminderService,
-            DecisionTreeSessionHandler decisionTreeSessionHandler) {
-        this.pillReminderService = pillReminderService;
+    public UpdatePillRegimenListener(PillReminders pillReminders, DecisionTreeSessionHandler decisionTreeSessionHandler) {
+        this.pillReminders = pillReminders;
         this.decisionTreeSessionHandler = decisionTreeSessionHandler;
     }
 
@@ -31,14 +28,6 @@ public class UpdatePillRegimenListener {
         String motechId = decisionTreeSessionHandler.getMotechIdForSessionWithId(event.getParameters()
                 .get("flowSessionId").toString());
 
-        PillRegimenResponse response = pillReminderService.getPillRegimen(motechId);
-        String regimenId = response.getPillRegimenId();
-        String dosageId = getDosageId(response.getDosages());
-
-        pillReminderService.dosageStatusKnown(regimenId, dosageId, LocalDate.now());
-    }
-
-    private String getDosageId(List<DosageResponse> dosages) {
-        return dosages.get(0).getDosageId();
+        pillReminders.setDosageStatusKnownForPatient(motechId);
     }
 }

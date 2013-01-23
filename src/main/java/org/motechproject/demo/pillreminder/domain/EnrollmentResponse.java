@@ -5,9 +5,9 @@ import java.util.List;
 
 public class EnrollmentResponse {
     private String startTime;
-    
+
     private List<String> errors = new ArrayList<>();
-    
+
     public int errorCount() {
         return errors.size();
     }
@@ -35,5 +35,4 @@ public class EnrollmentResponse {
     public void setErrors(List<String> errors) {
         this.errors = errors;
     }
-
 }

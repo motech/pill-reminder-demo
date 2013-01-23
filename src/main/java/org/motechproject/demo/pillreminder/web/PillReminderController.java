@@ -8,7 +8,7 @@ import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
 import org.motechproject.demo.pillreminder.domain.MrsPatientSearchResult;
 import org.motechproject.demo.pillreminder.domain.PillReminderResponse;
-import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
+import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
 import org.motechproject.demo.pillreminder.support.PillReminderEnroller;
 import org.motechproject.demo.pillreminder.support.PillReminders;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +26,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class PillReminderController {
 
     private final PillReminderEnroller enroller;
-    private final MrsEntityFinder mrsEntityFinder;
+    private final MrsEntityFacade mrsEntityFacade;
     private final PillReminders pillReminders;
 
     @Autowired
-    public PillReminderController(PillReminderEnroller enroller, MrsEntityFinder mrsEntityFinder,
+    public PillReminderController(PillReminderEnroller enroller, MrsEntityFacade mrsEntityFacade,
             PillReminders pillReminders) {
         this.enroller = enroller;
-        this.mrsEntityFinder = mrsEntityFinder;
+        this.mrsEntityFacade = mrsEntityFacade;
         this.pillReminders = pillReminders;
     }
 
@@ -83,7 +83,7 @@ public class PillReminderController {
     @RequestMapping(value = "/search-patient/{motechId}", method = RequestMethod.GET)
     @ResponseBody
     public MrsPatientSearchResult searchForPatient(@PathVariable String motechId) {
-        return MrsPatientSearchResult.fromMrsPatient(mrsEntityFinder.findPatientByMotechId(motechId));
+        return MrsPatientSearchResult.fromMrsPatient(mrsEntityFacade.findPatientByMotechId(motechId));
     }
 
     @RequestMapping(value = "/pillreminders/{motechId}", method = RequestMethod.GET)

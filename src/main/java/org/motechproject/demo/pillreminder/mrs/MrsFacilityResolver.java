@@ -7,6 +7,10 @@ import org.motechproject.mrs.services.MRSFacilityAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Resolves the MOTECH facility from the OpenMRS. If the facility does not
+ * exist, then a default facility is created
+ */
 @Component
 public class MrsFacilityResolver {
 

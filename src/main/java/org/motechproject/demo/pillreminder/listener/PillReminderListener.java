@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.motechproject.demo.pillreminder.PillReminderSettings;
 import org.motechproject.demo.pillreminder.mrs.MrsConstants;
-import org.motechproject.demo.pillreminder.mrs.MrsEntityFinder;
+import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
 import org.motechproject.demo.pillreminder.support.CallRequestDataKeys;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.annotations.MotechListener;
@@ -21,18 +21,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * MOTECH Listener that handles a pill reminder event. Upon receiving the event,
+ * this listener attempts to retrieve information about patient, specifically
+ * the patients phone number. It then initiates a call to that patient using the
+ * provider IVR service. Note: Though the IVRService is a generic interface and
+ * in theory could be swapped out by another implementation, this listener is
+ * dependent on the Verboice IVR Service because of details within that
+ * implementation class
+ */
 @Component
 public class PillReminderListener {
     private final Logger logger = LoggerFactory.getLogger(PillReminderListener.class);
 
     private final IVRService ivrService;
-    private final MrsEntityFinder mrsEntityFinder;
+    private final MrsEntityFacade mrsEntityFacade;
     private final PillReminderSettings settings;
 
     @Autowired
-    public PillReminderListener(IVRService ivrService, MrsEntityFinder mrsEntityFinder, PillReminderSettings settings) {
+    public PillReminderListener(IVRService ivrService, MrsEntityFacade mrsEntityFacade, PillReminderSettings settings) {
         this.ivrService = ivrService;
-        this.mrsEntityFinder = mrsEntityFinder;
+        this.mrsEntityFacade = mrsEntityFacade;
         this.settings = settings;
     }
 
@@ -43,7 +52,7 @@ public class PillReminderListener {
         }
 
         String motechId = motechEvent.getParameters().get(EventKeys.EXTERNAL_ID_KEY).toString();
-        MRSPatient patient = mrsEntityFinder.findPatientByMotechId(motechId);
+        MRSPatient patient = mrsEntityFacade.findPatientByMotechId(motechId);
 
         String phonenum = getPhoneFromAttributes(patient.getPerson().getAttributes());
         if (phonenum == null) {
@@ -59,7 +68,14 @@ public class PillReminderListener {
         CallRequest callRequest = new CallRequest(phonenum, 120, settings.getVerboiceChannelName());
 
         Map<String, String> payload = callRequest.getPayload();
+
+        // it's important that we store the motech id in the call request
+        // payload. The verboice ivr service will copy all payload data to the
+        // flow session so that we can retrieve it at a later time
         payload.put(CallRequestDataKeys.MOTECH_ID, motechId);
+
+        // the callback_url is used once verboice starts a call to retrieve the
+        // data for the call (e.g. TwiML)
         String callbackUrl = settings.getMotechUrl() + "/module/pillreminder-demo/ivr/start?motech_call_id=%s";
         try {
             payload.put(CallRequestDataKeys.CALLBACK_URL,

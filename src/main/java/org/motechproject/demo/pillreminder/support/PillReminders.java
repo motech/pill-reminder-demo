@@ -1,52 +1,17 @@
 package org.motechproject.demo.pillreminder.support;
 
-import org.joda.time.LocalDate;
 import org.motechproject.demo.pillreminder.domain.PillReminderResponse;
-import org.motechproject.server.pillreminder.api.contract.DosageResponse;
-import org.motechproject.server.pillreminder.api.contract.PillRegimenResponse;
-import org.motechproject.server.pillreminder.api.service.PillReminderService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
-public class PillReminders {
+public interface PillReminders {
 
-    private static final String NO_RESPONSE_CAPTURED_YET = "No response captured yet";
-    private PillReminderService pillReminderService;
+    PillReminderResponse findPillReminderByMotechId(String motechId);
 
-    @Autowired
-    public PillReminders(PillReminderService pillReminderService) {
-        this.pillReminderService = pillReminderService;
-    }
+    void deletePillReminder(String motechId);
 
-    public PillReminderResponse findPillReminderByMotechId(String motechId) {
-        PillRegimenResponse regimen = pillReminderService.getPillRegimen(motechId);
-        return getPillReminderResponseFromRegimen(regimen);
-    }
+    void setDosageStatusKnownForPatient(String motechId);
 
-    private PillReminderResponse getPillReminderResponseFromRegimen(PillRegimenResponse regimen) {
-        PillReminderResponse response = new PillReminderResponse();
-        if (regimen == null) {
-            return response;
-        }
+    boolean isPatientInPillRegimen(String motechId);
 
-        DosageResponse dosageResponse = regimen.getDosages().get(0);
-        response.setStartTime(dosageResponse.getDosageHour() + ":"
-                + String.format("%02d", dosageResponse.getDosageMinute()));
+    String registerNewPatientIntoPillRegimen(String motechId, String dosageStartTime);
 
-        response.setLastCapturedDate(getMessageFromLastCapturedDate(dosageResponse.getResponseLastCapturedDate()));
-        return response;
-    }
-
-    private String getMessageFromLastCapturedDate(LocalDate responseLastCapturedDate) {
-        if (responseLastCapturedDate == null) {
-            return NO_RESPONSE_CAPTURED_YET;
-        }
-
-        return responseLastCapturedDate.toString();
-    }
-
-    public void deletePillReminder(String motechId) {
-        pillReminderService.remove(motechId);
-    }
 }
