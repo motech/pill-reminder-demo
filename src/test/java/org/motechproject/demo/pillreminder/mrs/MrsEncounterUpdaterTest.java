@@ -8,11 +8,11 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.mrs.model.MRSEncounter;
-import org.motechproject.mrs.model.MRSFacility;
-import org.motechproject.mrs.model.MRSPatient;
-import org.motechproject.mrs.model.MRSUser;
-import org.motechproject.mrs.services.MRSEncounterAdapter;
+import org.motechproject.mrs.domain.Encounter;
+import org.motechproject.mrs.model.OpenMRSFacility;
+import org.motechproject.mrs.model.OpenMRSPatient;
+import org.motechproject.mrs.model.OpenMRSProvider;
+import org.motechproject.mrs.services.EncounterAdapter;
 
 public class MrsEncounterUpdaterTest {
 
@@ -20,7 +20,7 @@ public class MrsEncounterUpdaterTest {
     private MrsEntityFacade mrsEntityFacade;
 
     @Mock
-    private MRSEncounterAdapter encounterAdapter;
+    private EncounterAdapter encounterAdapter;
 
     private MrsEncounterCreator updater;
 
@@ -32,12 +32,12 @@ public class MrsEncounterUpdaterTest {
 
     @Test
     public void shouldCreateEncounter() {
-        when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(new MRSPatient("700"));
-        when(mrsEntityFacade.findMotechFacility()).thenReturn(new MRSFacility(null));
-        when(mrsEntityFacade.findMotechUser()).thenReturn(new MRSUser());
+        when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(new OpenMRSPatient("700"));
+        when(mrsEntityFacade.findMotechFacility()).thenReturn(new OpenMRSFacility(null));
+        when(mrsEntityFacade.findMotechUser()).thenReturn(new OpenMRSProvider());
 
         updater.createPillTakenEncounterForPatient("700");
 
-        verify(encounterAdapter).createEncounter(any(MRSEncounter.class));
+        verify(encounterAdapter).createEncounter(any(Encounter.class));
     }
 }

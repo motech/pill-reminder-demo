@@ -8,17 +8,19 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.motechproject.mrs.model.MRSFacility;
-import org.motechproject.mrs.services.MRSFacilityAdapter;
+import org.motechproject.mrs.domain.Facility;
+import org.motechproject.mrs.model.OpenMRSFacility;
+import org.motechproject.mrs.services.FacilityAdapter;
 
 public class MrsFacilityResolverTest {
 
     @Mock
-    private MRSFacilityAdapter facilityAdapter;
+    private FacilityAdapter facilityAdapter;
     private MrsFacilityResolver facilityResolver;
 
     @Before
@@ -27,33 +29,36 @@ public class MrsFacilityResolverTest {
         facilityResolver = new MrsFacilityResolver(facilityAdapter);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void shouldReturnFirstFoundFacility() {
-        MRSFacility facility1 = new MRSFacility("1");
-        MRSFacility facility2 = new MRSFacility("2");
+        OpenMRSFacility facility1 = new OpenMRSFacility("1");
+        OpenMRSFacility facility2 = new OpenMRSFacility("2");
+        List<OpenMRSFacility> facilities = Arrays.asList(facility1, facility2);
+        when(facilityAdapter.getFacilities("Motech")).thenReturn((List) facilities);
 
-        when(facilityAdapter.getFacilities("Motech")).thenReturn(Arrays.asList(facility1, facility2));
-
-        MRSFacility resolvedFacility = facilityResolver.resolveMotechFacility();
+        OpenMRSFacility resolvedFacility = facilityResolver.resolveMotechFacility();
 
         assertEquals("1", resolvedFacility.getId());
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void shouldCreateNewFacilityWhenNonFound() {
-        when(facilityAdapter.getFacilities("Motech")).thenReturn(Collections.<MRSFacility> emptyList());
+        when(facilityAdapter.getFacilities("Motech")).thenReturn((List)Collections.<OpenMRSFacility> emptyList());
 
         facilityResolver.resolveMotechFacility();
 
-        verify(facilityAdapter).saveFacility(any(MRSFacility.class));
+        verify(facilityAdapter).saveFacility(any(Facility.class));
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Test
     public void shouldReturnNewlySavedFacilityWhenResolved() {
-        when(facilityAdapter.getFacilities("Motech")).thenReturn(Collections.<MRSFacility> emptyList());
-        when(facilityAdapter.saveFacility(any(MRSFacility.class))).thenReturn(new MRSFacility("5"));
+        when(facilityAdapter.getFacilities("Motech")).thenReturn((List)Collections.<OpenMRSFacility> emptyList());
+        when(facilityAdapter.saveFacility(any(Facility.class))).thenReturn(new OpenMRSFacility("5"));
 
-        MRSFacility saved = facilityResolver.resolveMotechFacility();
+        OpenMRSFacility saved = facilityResolver.resolveMotechFacility();
 
         assertEquals("5", saved.getId());
     }

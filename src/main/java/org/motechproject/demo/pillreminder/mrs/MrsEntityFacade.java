@@ -1,12 +1,12 @@
 package org.motechproject.demo.pillreminder.mrs;
 
-import java.util.Date;
-
-import org.motechproject.mrs.model.MRSFacility;
-import org.motechproject.mrs.model.MRSPatient;
-import org.motechproject.mrs.model.MRSPerson;
-import org.motechproject.mrs.model.MRSUser;
-import org.motechproject.mrs.services.MRSPatientAdapter;
+import org.motechproject.commons.date.util.DateUtil;
+import org.motechproject.mrs.domain.Patient;
+import org.motechproject.mrs.model.OpenMRSFacility;
+import org.motechproject.mrs.model.OpenMRSPatient;
+import org.motechproject.mrs.model.OpenMRSPerson;
+import org.motechproject.mrs.model.OpenMRSProvider;
+import org.motechproject.mrs.services.PatientAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,38 +20,38 @@ public class MrsEntityFacade {
     private static final String DEFAULT_LAST_NAME = "MOTECH Last Name";
     private static final String DEFAULT_GENDER = "M";
 
-    private MRSPatientAdapter patientAdapter;
+    private PatientAdapter patientAdapter;
     private MrsUserResolver userResolver;
     private MrsFacilityResolver facilityResolver;
 
     @Autowired
-    public MrsEntityFacade(MRSPatientAdapter patientAdapter, MrsUserResolver userResolver,
+    public MrsEntityFacade(PatientAdapter patientAdapter, MrsUserResolver userResolver,
             MrsFacilityResolver facilityResolver) {
         this.patientAdapter = patientAdapter;
         this.userResolver = userResolver;
         this.facilityResolver = facilityResolver;
     }
 
-    public MRSUser findMotechUser() {
+    public OpenMRSProvider findMotechUser() {
         return userResolver.resolveMotechUser();
     }
 
-    public MRSFacility findMotechFacility() {
+    public OpenMRSFacility findMotechFacility() {
         return facilityResolver.resolveMotechFacility();
     }
 
-    public MRSPatient findPatientByMotechId(String motechId) {
-        return patientAdapter.getPatientByMotechId(motechId);
+    public OpenMRSPatient findPatientByMotechId(String motechId) {
+        return (OpenMRSPatient) patientAdapter.getPatientByMotechId(motechId);
     }
 
-    public MRSPatient createDumbyPatient(String patientMotechId) {
-        MRSPerson person = new MRSPerson();
+    public Patient createDumbyPatient(String patientMotechId) {
+        OpenMRSPerson person = new OpenMRSPerson();
         person.firstName(DEFAULT_FIRST_NAME);
         person.lastName(DEFAULT_LAST_NAME);
         person.gender(DEFAULT_GENDER);
-        person.dateOfBirth(new Date());
+        person.setDateOfBirth(DateUtil.now());
 
-        MRSPatient patient = new MRSPatient(patientMotechId, person, facilityResolver.resolveMotechFacility());
+        OpenMRSPatient patient = new OpenMRSPatient(patientMotechId, person, facilityResolver.resolveMotechFacility());
         return patientAdapter.savePatient(patient);
     }
 }

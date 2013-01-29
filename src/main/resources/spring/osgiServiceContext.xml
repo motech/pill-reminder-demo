@@ -7,13 +7,13 @@
     <osgi:reference cardinality="0..1" id="flowSessionServiceOsgi"
         interface="org.motechproject.decisiontree.server.service.FlowSessionService" />
 
-    <osgi:reference cardinality="0..1" id="mrsPatientAdapterOsgi" interface="org.motechproject.mrs.services.MRSPatientAdapter" />
+    <osgi:reference cardinality="0..1" id="mrsPatientAdapterOsgi" interface="org.motechproject.mrs.services.PatientAdapter" />
 
-    <osgi:reference cardinality="0..1" id="mrsFacilityAdapterOsgi" interface="org.motechproject.mrs.services.MRSFacilityAdapter" />
+    <osgi:reference cardinality="0..1" id="mrsFacilityAdapterOsgi" interface="org.motechproject.mrs.services.FacilityAdapter" />
 
-    <osgi:reference cardinality="0..1" id="mrsUserAdapterOsgi" interface="org.motechproject.mrs.services.MRSUserAdapter" />
+    <osgi:reference cardinality="0..1" id="mrsUserAdapterOsgi" interface="org.motechproject.mrs.services.UserAdapter" />
 
-    <osgi:reference cardinality="0..1" id="mrsEncounterAdapterOsgi" interface="org.motechproject.mrs.services.MRSEncounterAdapter" />
+    <osgi:reference cardinality="0..1" id="mrsEncounterAdapterOsgi" interface="org.motechproject.mrs.services.EncounterAdapter" />
 
     <osgi:reference cardinality="0..1" id="decisionTreeServiceOsgi"
         interface="org.motechproject.decisiontree.core.DecisionTreeService" />

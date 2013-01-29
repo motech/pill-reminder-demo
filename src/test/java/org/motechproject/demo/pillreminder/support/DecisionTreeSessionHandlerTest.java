@@ -12,9 +12,9 @@ import org.motechproject.decisiontree.core.FlowSession;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
 import org.motechproject.demo.pillreminder.mrs.MrsConstants;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
-import org.motechproject.mrs.model.Attribute;
-import org.motechproject.mrs.model.MRSPatient;
-import org.motechproject.mrs.model.MRSPerson;
+import org.motechproject.mrs.model.OpenMRSAttribute;
+import org.motechproject.mrs.model.OpenMRSPatient;
+import org.motechproject.mrs.model.OpenMRSPerson;
 
 public class DecisionTreeSessionHandlerTest {
 
@@ -44,9 +44,9 @@ public class DecisionTreeSessionHandlerTest {
     }
 
     private void stubEntityFinder() {
-        MRSPerson person = new MRSPerson();
-        person.addAttribute(new Attribute(MrsConstants.PERSON_PIN_ATTR_NAME, "5432"));
-        MRSPatient patient = new MRSPatient("500", person, null);
+        OpenMRSPerson person = new OpenMRSPerson();
+        person.addAttribute(new OpenMRSAttribute(MrsConstants.PERSON_PIN_ATTR_NAME, "5432"));
+        OpenMRSPatient patient = new OpenMRSPatient("500", person, null);
         when(mrsEntityFacade.findPatientByMotechId("500")).thenReturn(patient);
     }
 

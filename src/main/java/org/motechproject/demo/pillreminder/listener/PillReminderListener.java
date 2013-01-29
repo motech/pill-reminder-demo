@@ -13,8 +13,8 @@ import org.motechproject.event.MotechEvent;
 import org.motechproject.event.listener.annotations.MotechListener;
 import org.motechproject.ivr.service.CallRequest;
 import org.motechproject.ivr.service.IVRService;
-import org.motechproject.mrs.model.Attribute;
-import org.motechproject.mrs.model.MRSPatient;
+import org.motechproject.mrs.domain.Attribute;
+import org.motechproject.mrs.domain.Patient;
 import org.motechproject.server.pillreminder.api.EventKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class PillReminderListener {
         }
 
         String motechId = motechEvent.getParameters().get(EventKeys.EXTERNAL_ID_KEY).toString();
-        MRSPatient patient = mrsEntityFacade.findPatientByMotechId(motechId);
+        Patient patient = mrsEntityFacade.findPatientByMotechId(motechId);
 
         String phonenum = getPhoneFromAttributes(patient.getPerson().getAttributes());
         if (phonenum == null) {
@@ -92,8 +92,8 @@ public class PillReminderListener {
 
     private String getPhoneFromAttributes(List<Attribute> attributes) {
         for (Attribute attr : attributes) {
-            if (MrsConstants.PERSON_PHONE_NUMBER_ATTR_NAME.equals(attr.name())) {
-                return attr.value();
+            if (MrsConstants.PERSON_PHONE_NUMBER_ATTR_NAME.equals(attr.getName())) {
+                return attr.getValue();
             }
         }
 

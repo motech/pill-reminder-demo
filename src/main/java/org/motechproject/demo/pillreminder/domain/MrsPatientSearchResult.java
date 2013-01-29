@@ -1,7 +1,8 @@
 package org.motechproject.demo.pillreminder.domain;
 
-import org.motechproject.mrs.model.MRSPatient;
-import org.motechproject.mrs.model.MRSPerson;
+import org.motechproject.mrs.domain.Patient;
+import org.motechproject.mrs.domain.Person;
+
 
 public class MrsPatientSearchResult {
 
@@ -9,7 +10,7 @@ public class MrsPatientSearchResult {
     private String lastName;
     private String motechId;
 
-    public void setFieldsFromMrsPerson(MRSPerson person) {
+    public void setFieldsFromMrsPerson(Person person) {
         this.firstName = person.getFirstName();
         this.lastName = person.getLastName();
     }
@@ -38,7 +39,7 @@ public class MrsPatientSearchResult {
         this.motechId = motechId;
     }
 
-    public static MrsPatientSearchResult fromMrsPatient(MRSPatient findPatientByMotechId) {
+    public static MrsPatientSearchResult fromMrsPatient(Patient findPatientByMotechId) {
         MrsPatientSearchResult result = new MrsPatientSearchResult();
         if (findPatientByMotechId != null) {
             result.firstName = findPatientByMotechId.getPerson().getFirstName();

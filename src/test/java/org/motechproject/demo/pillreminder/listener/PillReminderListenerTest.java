@@ -14,9 +14,9 @@ import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
 import org.motechproject.event.MotechEvent;
 import org.motechproject.ivr.service.CallRequest;
 import org.motechproject.ivr.service.IVRService;
-import org.motechproject.mrs.model.Attribute;
-import org.motechproject.mrs.model.MRSPatient;
-import org.motechproject.mrs.model.MRSPerson;
+import org.motechproject.mrs.model.OpenMRSAttribute;
+import org.motechproject.mrs.model.OpenMRSPatient;
+import org.motechproject.mrs.model.OpenMRSPerson;
 import org.motechproject.server.pillreminder.api.EventKeys;
 
 public class PillReminderListenerTest {
@@ -40,8 +40,8 @@ public class PillReminderListenerTest {
 
     @Test
     public void shouldNotSendCallIfNoPhoneNumber() {
-        MRSPerson person = new MRSPerson();
-        MRSPatient patient = new MRSPatient(null, person, null);
+        OpenMRSPerson person = new OpenMRSPerson();
+        OpenMRSPatient patient = new OpenMRSPatient(null, person, null);
 
         when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(patient);
 
@@ -56,9 +56,9 @@ public class PillReminderListenerTest {
 
     @Test
     public void shouldNotSendCallIfNotFirstAttempt() {
-        MRSPerson person = new MRSPerson();
-        person.getAttributes().add(new Attribute("Phone Number", "555"));
-        MRSPatient patient = new MRSPatient(null, person, null);
+        OpenMRSPerson person = new OpenMRSPerson();
+        person.getAttributes().add(new OpenMRSAttribute("Phone Number", "555"));
+        OpenMRSPatient patient = new OpenMRSPatient(null, person, null);
 
         when(mrsEntityFacade.findPatientByMotechId("700")).thenReturn(patient);
 

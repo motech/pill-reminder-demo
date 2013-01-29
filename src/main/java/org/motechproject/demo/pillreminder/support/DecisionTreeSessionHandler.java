@@ -7,8 +7,8 @@ import org.motechproject.decisiontree.core.FlowSession;
 import org.motechproject.decisiontree.server.service.FlowSessionService;
 import org.motechproject.demo.pillreminder.mrs.MrsConstants;
 import org.motechproject.demo.pillreminder.mrs.MrsEntityFacade;
-import org.motechproject.mrs.model.Attribute;
-import org.motechproject.mrs.model.MRSPatient;
+import org.motechproject.mrs.domain.Attribute;
+import org.motechproject.mrs.domain.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +36,7 @@ public class DecisionTreeSessionHandler {
 
     public boolean digitsMatchPatientPin(String sessionId, String digits) {
         String motechId = getMotechIdForSessionWithId(sessionId);
-        MRSPatient patient = mrsEntityFacade.findPatientByMotechId(motechId);
+        Patient patient = mrsEntityFacade.findPatientByMotechId(motechId);
         String pin = readPinAttributeValue(patient);
 
         if (StringUtils.isNotBlank(digits) && digits.equals(pin)) {
@@ -46,12 +46,12 @@ public class DecisionTreeSessionHandler {
         }
     }
 
-    private String readPinAttributeValue(MRSPatient patient) {
+    private String readPinAttributeValue(Patient patient) {
         List<Attribute> attrs = patient.getPerson().getAttributes();
         String pin = null;
         for (Attribute attr : attrs) {
-            if (MrsConstants.PERSON_PIN_ATTR_NAME.equals(attr.name())) {
-                pin = attr.value();
+            if (MrsConstants.PERSON_PIN_ATTR_NAME.equals(attr.getName())) {
+                pin = attr.getValue();
             }
         }
         return pin;

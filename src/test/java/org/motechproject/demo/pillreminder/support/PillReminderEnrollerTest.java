@@ -12,10 +12,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.motechproject.demo.pillreminder.domain.EnrollmentRequest;
 import org.motechproject.demo.pillreminder.domain.EnrollmentResponse;
-import org.motechproject.mrs.model.Attribute;
-import org.motechproject.mrs.model.MRSPatient;
-import org.motechproject.mrs.model.MRSPerson;
-import org.motechproject.mrs.services.MRSPatientAdapter;
+import org.motechproject.mrs.domain.Patient;
+import org.motechproject.mrs.model.OpenMRSAttribute;
+import org.motechproject.mrs.model.OpenMRSPatient;
+import org.motechproject.mrs.model.OpenMRSPerson;
+import org.motechproject.mrs.services.PatientAdapter;
 
 public class PillReminderEnrollerTest {
 
@@ -23,7 +24,7 @@ public class PillReminderEnrollerTest {
     PillReminders pillReminders;
 
     @Mock
-    MRSPatientAdapter patientAdapter;
+    PatientAdapter patientAdapter;
 
     PillReminderEnroller enroller;
 
@@ -52,11 +53,11 @@ public class PillReminderEnrollerTest {
 
     @Test
     public void shouldGiveErrorIfAttributeTypeIsMissingFromOpenMrs() {
-        MRSPerson person = new MRSPerson();
-        MRSPatient patient = new MRSPatient(null, person, null);
+        OpenMRSPerson person = new OpenMRSPerson();
+        OpenMRSPatient patient = new OpenMRSPatient(null, person, null);
 
         when(patientAdapter.getPatientByMotechId("558")).thenReturn(patient);
-        when(patientAdapter.updatePatient(any(MRSPatient.class))).thenThrow(
+        when(patientAdapter.updatePatient(any(Patient.class))).thenThrow(
                 new RuntimeException("Attribute type not found"));
 
         EnrollmentResponse response = enroller.enrollPatientWithId(getRequest("558", "1234", "notused", null));
@@ -79,7 +80,7 @@ public class PillReminderEnrollerTest {
         stubValidPatient();
         enroller.enrollPatientWithId(getRequest("558", null, null, "10:05"));
 
-        verify(patientAdapter).updatePatient(any(MRSPatient.class));
+        verify(patientAdapter).updatePatient(any(Patient.class));
     }
 
     @Test
@@ -91,10 +92,10 @@ public class PillReminderEnrollerTest {
     }
 
     private void stubValidPatient() {
-        MRSPerson savedPerson = new MRSPerson();
-        savedPerson.addAttribute(new Attribute("Phone Number", ""));
-        savedPerson.addAttribute(new Attribute("Pin", ""));
-        MRSPatient savedPatient = new MRSPatient(null, savedPerson, null);
+        OpenMRSPerson savedPerson = new OpenMRSPerson();
+        savedPerson.addAttribute(new OpenMRSAttribute("Phone Number", ""));
+        savedPerson.addAttribute(new OpenMRSAttribute("Pin", ""));
+        OpenMRSPatient savedPatient = new OpenMRSPatient(null, savedPerson, null);
         when(patientAdapter.getPatientByMotechId("558")).thenReturn(savedPatient);
     }
 }

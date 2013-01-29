@@ -7,18 +7,24 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.motechproject.mrs.domain.User;
 import org.motechproject.mrs.exception.UserAlreadyExistsException;
-import org.motechproject.mrs.model.MRSUser;
-import org.motechproject.mrs.services.MRSUserAdapter;
+import org.motechproject.mrs.model.OpenMRSPerson;
+import org.motechproject.mrs.model.OpenMRSProvider;
+import org.motechproject.mrs.model.OpenMRSUser;
+import org.motechproject.mrs.services.UserAdapter;
 
 public class MrsUserResolverTest {
 
     @Mock
-    private MRSUserAdapter userAdapter;
+    private UserAdapter userAdapter;
 
     private MrsUserResolver userResolver;
 
@@ -30,25 +36,40 @@ public class MrsUserResolverTest {
 
     @Test
     public void shouldReturnMotechUserWhenFound() {
-        when(userAdapter.getUserByUserName(MrsUserResolver.MOTECH_USERNAME)).thenReturn(new MRSUser());
+        when(userAdapter.getUserByUserName(MrsUserResolver.MOTECH_USERNAME)).thenReturn(stubUser());
 
-        MRSUser user = userResolver.resolveMotechUser();
+        OpenMRSProvider provider = userResolver.resolveMotechUser();
 
-        assertNotNull(user);
+        assertNotNull(provider);
+    }
+
+    private User stubUser() {
+        OpenMRSUser user = new OpenMRSUser();
+        user.setPerson(new OpenMRSPerson());
+        user.getPerson().setPersonId("1");
+        return user;
     }
 
     @Test
     public void shouldCreateNewUserWhenMotechUserNotFound() throws UserAlreadyExistsException {
+        stubSaveUser();
         userResolver.resolveMotechUser();
 
-        verify(userAdapter).saveUser(any(MRSUser.class));
+        verify(userAdapter).saveUser(any(User.class));
+    }
+
+    private void stubSaveUser() throws UserAlreadyExistsException {
+        Map<String, Object> saved = new HashMap<>();
+        saved.put(UserAdapter.USER_KEY, stubUser());
+        when(userAdapter.saveUser(any(User.class))).thenReturn(saved);
     }
 
     @Test
     public void shouldUseProviderRoleWhenCreatingMotechUser() throws UserAlreadyExistsException {
+        stubSaveUser();
         userResolver.resolveMotechUser();
 
-        ArgumentCaptor<MRSUser> savedUser = ArgumentCaptor.forClass(MRSUser.class);
+        ArgumentCaptor<User> savedUser = ArgumentCaptor.forClass(User.class);
         verify(userAdapter).saveUser(savedUser.capture());
 
         assertEquals("Provider", savedUser.getValue().getSecurityRole());
@@ -56,11 +77,11 @@ public class MrsUserResolverTest {
 
     @Test
     public void shouldRequeryForUserIfSaveFails() throws UserAlreadyExistsException {
-        when(userAdapter.getUserByUserName(MrsUserResolver.MOTECH_USERNAME)).thenReturn(null).thenReturn(new MRSUser().id("1"));
-        when(userAdapter.saveUser(any(MRSUser.class))).thenThrow(new UserAlreadyExistsException());
+        when(userAdapter.getUserByUserName(MrsUserResolver.MOTECH_USERNAME)).thenReturn(null).thenReturn(stubUser());
+        when(userAdapter.saveUser(any(User.class))).thenThrow(new UserAlreadyExistsException());
 
-        MRSUser user = userResolver.resolveMotechUser();
+        OpenMRSProvider provider = userResolver.resolveMotechUser();
         
-        assertEquals("1", user.getId());
+        assertEquals("1", provider.getProviderId());
     }
 }
