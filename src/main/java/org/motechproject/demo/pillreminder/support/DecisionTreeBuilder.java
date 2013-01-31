@@ -5,6 +5,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.motechproject.decisiontree.core.DecisionTreeService;
+import org.motechproject.decisiontree.core.model.AudioPrompt;
 import org.motechproject.decisiontree.core.model.EventTransition;
 import org.motechproject.decisiontree.core.model.Node;
 import org.motechproject.decisiontree.core.model.Prompt;
@@ -56,7 +57,7 @@ public class DecisionTreeBuilder {
             }
         }
     }
-
+    
     private void createDecisionTree() {
         Tree tree = new Tree();
         tree.setName("DemoTree");
@@ -64,9 +65,9 @@ public class DecisionTreeBuilder {
 
         rootTransition.setDestinationNode(new Node().setNoticePrompts(
                 new Prompt[] {
-                        new TextToSpeechPrompt()
-                                .setMessage("Have you taken the recommended dosage of the demo medicine?"),
-                        new TextToSpeechPrompt().setMessage("If yes, then press 1. Otherwise press 3") })
+                        new AudioPrompt()
+                                .setAudioFileUrl("/wav/dosageQuestion1.wav"),
+                        new AudioPrompt().setAudioFileUrl("/wav/dosageQuestion2.wav") })
                 .setTransitions(
                         new Object[][] { { "1", getPillTakenTransition() }, { "3", getPillNotTakenTransition() } }));
         tree.setRootTransition(rootTransition);
@@ -77,8 +78,8 @@ public class DecisionTreeBuilder {
     private Transition getPillNotTakenTransition() {
         EventTransition transition = new EventTransition();
         transition.setEventSubject(Events.PATIENT_MISSED_DOSAGE);
-        transition.setDestinationNode(new Node().setPrompts(new TextToSpeechPrompt()
-                .setMessage("You answered no. Thank you for your response.")));
+        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt()
+                .setAudioFileUrl("/wav/dosageAnswerNo.wav")));
         transition.setName("missed dosage");
         return transition;
     }
@@ -86,8 +87,8 @@ public class DecisionTreeBuilder {
     private Transition getPillTakenTransition() {
         EventTransition transition = new EventTransition();
         transition.setEventSubject(Events.PATIENT_TOOK_DOSAGE);
-        transition.setDestinationNode(new Node().setPrompts(new TextToSpeechPrompt()
-                .setMessage("You answered yes. Thank you for your response.")));
+        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt()
+        .setAudioFileUrl("/wav/dosageAnswerYes.wav")));
         transition.setName("pill taken");
         return transition;
     }
