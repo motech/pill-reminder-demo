@@ -26,8 +26,6 @@ import org.springframework.stereotype.Component;
 public class DecisionTreeBuilder {
     private final Logger logger = LoggerFactory.getLogger(DecisionTreeBuilder.class);
 
-    private static final String CMSLITE_STREAM_PATH = "/module/cmsliteapi/stream/";
-
     private final DecisionTreeService decisionTreeService;
     private final PillReminderSettings settings;
 
@@ -70,8 +68,9 @@ public class DecisionTreeBuilder {
         Transition rootTransition = new Transition();
 
         rootTransition.setDestinationNode(new Node().setNoticePrompts(
-                new Prompt[] { new AudioPrompt().setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_QUESTION_1)),
-                        new AudioPrompt().setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_QUESTION_2)) })
+                new Prompt[] {
+                        new AudioPrompt().setAudioFileUrl(settings.getCmsliteUrlFor(SoundFiles.DOSAGE_QUESTION_1)),
+                        new AudioPrompt().setAudioFileUrl(settings.getCmsliteUrlFor(SoundFiles.DOSAGE_QUESTION_2)) })
                 .setTransitions(
                         new Object[][] { { "1", getPillTakenTransition() }, { "3", getPillNotTakenTransition() } }));
         tree.setRootTransition(rootTransition);
@@ -79,15 +78,11 @@ public class DecisionTreeBuilder {
         decisionTreeService.saveDecisionTree(tree);
     }
 
-    private String getCmsliteUrlFor(String soundFilename) {
-        return settings.getMotechUrl() + CMSLITE_STREAM_PATH + "en/" + soundFilename;
-    }
-
     private Transition getPillNotTakenTransition() {
         EventTransition transition = new EventTransition();
         transition.setEventSubject(Events.PATIENT_MISSED_DOSAGE);
-        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt()
-                .setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_ANSWER_NO))));
+        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt().setAudioFileUrl(settings
+                .getCmsliteUrlFor(SoundFiles.DOSAGE_ANSWER_NO))));
         transition.setName("missed dosage");
         return transition;
     }
@@ -95,8 +90,8 @@ public class DecisionTreeBuilder {
     private Transition getPillTakenTransition() {
         EventTransition transition = new EventTransition();
         transition.setEventSubject(Events.PATIENT_TOOK_DOSAGE);
-        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt()
-                .setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_ANSWER_YES))));
+        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt().setAudioFileUrl(settings
+                .getCmsliteUrlFor(SoundFiles.DOSAGE_ANSWER_YES))));
         transition.setName("pill taken");
         return transition;
     }

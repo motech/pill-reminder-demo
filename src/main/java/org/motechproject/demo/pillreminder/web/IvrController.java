@@ -2,10 +2,9 @@ package org.motechproject.demo.pillreminder.web;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.motechproject.decisiontree.server.service.FlowSessionService;
 import org.motechproject.demo.pillreminder.PillReminderSettings;
+import org.motechproject.demo.pillreminder.content.SoundFiles;
 import org.motechproject.demo.pillreminder.support.DecisionTreeSessionHandler;
-import org.motechproject.ivr.service.IVRService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +16,6 @@ public class IvrController {
 
     private DecisionTreeSessionHandler decisionTreeSessionHandler;
     private PillReminderSettings settings;
-
-    @Autowired
-    IVRService ivrService;
-
-    @Autowired
-    FlowSessionService flowSessionService;
 
     @Autowired
     public IvrController(DecisionTreeSessionHandler decisionTreeSessionHandler, PillReminderSettings settings) {
@@ -46,6 +39,7 @@ public class IvrController {
         decisionTreeSessionHandler.updateFlowSessionIdToVerboiceId(motechId, verboiceId);
 
         view.addObject("path", settings.getMotechUrl());
+        view.addObject("audioFileUrl", settings.getCmsliteUrlFor(SoundFiles.PIN_REQUEST));
         view.addObject("sessionId", verboiceId);
 
         return view;
@@ -70,6 +64,7 @@ public class IvrController {
             view.addObject("sessionId", sessionId);
         } else {
             view = new ModelAndView("failed-authentication");
+            view.addObject("audioFileUrl", settings.getCmsliteUrlFor(SoundFiles.INCORRECT_PIN));
         }
 
         return view;

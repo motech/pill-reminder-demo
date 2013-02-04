@@ -43,6 +43,8 @@ public class SoundContentLoader {
     private void loadSoundFiles() {
         logger.info("Attempting to load and save all wav files");
 
+        loadSoundFile(SoundFiles.PIN_REQUEST);
+        loadSoundFile(SoundFiles.INCORRECT_PIN);
         loadSoundFile(SoundFiles.DOSAGE_QUESTION_1);
         loadSoundFile(SoundFiles.DOSAGE_QUESTION_2);
         loadSoundFile(SoundFiles.DOSAGE_ANSWER_YES);
