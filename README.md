@@ -58,4 +58,15 @@ You can clone this repository if you need to make further changes:
 
     $ git clone git@github.com:motech/motech-server-pillreminder.git
 
+Demo Deployment Instructions
+----------------------------
 
+This demo requires the following software to be available and configured:
+
+* Verboice
+* OpenMRS 1.8.4
+* Commcare
+
+In addition to these pieces of software, we assume you have the necessary software for MOTECH: ActiveMQ, CouchDB and Tomcat.
+
+To be continued...
