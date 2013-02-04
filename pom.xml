@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.motechproject</groupId>
-    <version>0.17-SNAPSHOT</version>
+    <version>0.17-pr</version>
     <artifactId>motech-pillreminder-demo</artifactId>
     <packaging>bundle</packaging>
 
@@ -14,14 +14,14 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.1.0.RELEASE</spring.version>
-        <motech.version>0.17-SNAPSHOT</motech.version>
+        <motech.version>0.17-pr</motech.version>
     </properties>
 
     <repositories>
         <repository>
             <id>motech-repo</id>
             <name>MOTECH Maven Repository</name>
-            <url>http://nexus.motechproject.org/content/repositories/public</url>
+            <url>http://nexus.motechproject.org/content/repositories/demos</url>
         </repository>
     </repositories>
 
@@ -119,6 +119,11 @@
         <dependency>
             <groupId>org.motechproject</groupId>
             <artifactId>motech-commcare-api</artifactId>
+            <version>${motech.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.motechproject</groupId>
+            <artifactId>motech-cmslite-api</artifactId>
             <version>${motech.version}</version>
         </dependency>
         <dependency>

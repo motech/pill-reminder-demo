@@ -5,12 +5,14 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 import org.motechproject.decisiontree.core.DecisionTreeService;
+import org.motechproject.decisiontree.core.model.AudioPrompt;
 import org.motechproject.decisiontree.core.model.EventTransition;
 import org.motechproject.decisiontree.core.model.Node;
 import org.motechproject.decisiontree.core.model.Prompt;
-import org.motechproject.decisiontree.core.model.TextToSpeechPrompt;
 import org.motechproject.decisiontree.core.model.Transition;
 import org.motechproject.decisiontree.core.model.Tree;
+import org.motechproject.demo.pillreminder.PillReminderSettings;
+import org.motechproject.demo.pillreminder.content.SoundFiles;
 import org.motechproject.demo.pillreminder.events.Events;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +25,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class DecisionTreeBuilder {
     private final Logger logger = LoggerFactory.getLogger(DecisionTreeBuilder.class);
+
+    private static final String CMSLITE_STREAM_PATH = "/module/cmsliteapi/stream/";
+
     private final DecisionTreeService decisionTreeService;
+    private final PillReminderSettings settings;
 
     @Autowired
-    public DecisionTreeBuilder(DecisionTreeService decisionTreeService) {
+    public DecisionTreeBuilder(DecisionTreeService decisionTreeService, PillReminderSettings settings) {
         this.decisionTreeService = decisionTreeService;
+        this.settings = settings;
     }
 
     @PostConstruct
@@ -63,10 +70,8 @@ public class DecisionTreeBuilder {
         Transition rootTransition = new Transition();
 
         rootTransition.setDestinationNode(new Node().setNoticePrompts(
-                new Prompt[] {
-                        new TextToSpeechPrompt()
-                                .setMessage("Have you taken the recommended dosage of the demo medicine?"),
-                        new TextToSpeechPrompt().setMessage("If yes, then press 1. Otherwise press 3") })
+                new Prompt[] { new AudioPrompt().setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_QUESTION_1)),
+                        new AudioPrompt().setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_QUESTION_2)) })
                 .setTransitions(
                         new Object[][] { { "1", getPillTakenTransition() }, { "3", getPillNotTakenTransition() } }));
         tree.setRootTransition(rootTransition);
@@ -74,11 +79,15 @@ public class DecisionTreeBuilder {
         decisionTreeService.saveDecisionTree(tree);
     }
 
+    private String getCmsliteUrlFor(String soundFilename) {
+        return settings.getMotechUrl() + CMSLITE_STREAM_PATH + "en/" + soundFilename;
+    }
+
     private Transition getPillNotTakenTransition() {
         EventTransition transition = new EventTransition();
         transition.setEventSubject(Events.PATIENT_MISSED_DOSAGE);
-        transition.setDestinationNode(new Node().setPrompts(new TextToSpeechPrompt()
-                .setMessage("You answered no. Thank you for your response.")));
+        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt()
+                .setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_ANSWER_NO))));
         transition.setName("missed dosage");
         return transition;
     }
@@ -86,8 +95,8 @@ public class DecisionTreeBuilder {
     private Transition getPillTakenTransition() {
         EventTransition transition = new EventTransition();
         transition.setEventSubject(Events.PATIENT_TOOK_DOSAGE);
-        transition.setDestinationNode(new Node().setPrompts(new TextToSpeechPrompt()
-                .setMessage("You answered yes. Thank you for your response.")));
+        transition.setDestinationNode(new Node().setPrompts(new AudioPrompt()
+                .setAudioFileUrl(getCmsliteUrlFor(SoundFiles.DOSAGE_ANSWER_YES))));
         transition.setName("pill taken");
         return transition;
     }
